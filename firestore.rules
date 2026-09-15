@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// Data model (see src/services/repositories/firebase for the client code that reads/writes this):
+//
+// users/{userId}                              -> profile. userId is deterministic — a hash of
+//                                                 the account's email (see src/utils/identity.ts)
+//                                                 rather than a Firebase-generated id, since
+//                                                 "sign-in" is just "type your email": the same
+//                                                 email always resolves to the same userId.
+// users/{userId}/savedMembers/{memberId}       -> that user's private reusable contact list
+// users/{userId}/notifications/{notificationId}
+// groups/{groupId}                             -> memberIds: string[]; memberProfiles:
+//                                                 map<memberId, {id,name,avatarColor,email?,phone?}>
+//                                                 is the group's shared roster and travels with the
+//                                                 group doc itself (no separate members subcollection)
+// groups/{groupId}/expenses/{expenseId}
+// groups/{groupId}/settlements/{settlementId}
+// groups/{groupId}/activity/{activityId}
+//
+// POC trade-off, deliberate: there is no auth layer at all (no password, no Firebase Auth
+// session) — sharing an email is the entire access-control mechanism, enforced only client-side.
+// These rules are therefore wide open (`if true`) rather than checking request.auth, which is
+// always null here. That means anyone with this project's client config — not a secret, it ships
+// in the browser bundle — can read or write ANY document, not just ones whose id they can compute
+// from a known email. Acceptable for a demo; revisit before this holds anything real.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if true;
+
+      match /savedMembers/{memberId} {
+        allow read, write: if true;
+      }
+
+      match /notifications/{notificationId} {
+        allow read, write: if true;
+      }
+    }
+
+    match /groups/{groupId} {
+      allow read, write: if true;
+
+      match /expenses/{expenseId} {
+        allow read, write: if true;
+      }
+
+      match /settlements/{settlementId} {
+        allow read, write: if true;
+      }
+
+      match /activity/{activityId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}
