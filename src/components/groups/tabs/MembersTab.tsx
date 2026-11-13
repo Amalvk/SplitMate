@@ -61,7 +61,7 @@ export function MembersTab({ group }: { group: Group }) {
     // adding several new members in one batch doesn't have each write clobber the previous one.
     let current = group
     for (const id of newIds) {
-      const member = allMembers.find((m) => m.id === id)
+      const member = useDataStore.getState().members.find((m) => m.id === id)
       if (!member) continue
       await addMemberToGroupAction(current, id, member)
       current = {

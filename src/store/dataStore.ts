@@ -36,6 +36,8 @@ interface DataState {
   saveMember: (member: Member) => void
   updateMember: (member: Member) => void
   removeMember: (memberId: string) => void
+  /** Firebase mode: makes a just-saved member usable immediately, before the Firestore snapshot echoes it back. */
+  cacheSavedMember: (member: Member) => void
 
   // groups
   createGroup: (group: Group) => void
@@ -124,6 +126,11 @@ export const useDataStore = create<DataState>()(
 
       saveMember: (member) => set((s) => ({ members: [...s.members, member] })),
       updateMember: (member) => set((s) => ({ members: s.members.map((m) => (m.id === member.id ? member : m)) })),
+      cacheSavedMember: (member) =>
+        set((s) => ({
+          members: upsertById(s.members, [member]),
+          savedMemberIds: s.savedMemberIds.includes(member.id) ? s.savedMemberIds : [...s.savedMemberIds, member.id],
+        })),
       removeMember: (memberId) => set((s) => ({ members: s.members.filter((m) => m.id !== memberId) })),
 
       createGroup: (group) => set((s) => ({ groups: [...s.groups, group] })),

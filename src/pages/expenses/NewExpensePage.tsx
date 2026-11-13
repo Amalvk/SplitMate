@@ -20,7 +20,7 @@ export default function NewExpensePage() {
       </Button>
 
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Add Expense</h1>
+        <h1 className="text-xl font-bold tracking-tight">Add Expense</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Split it however makes sense.</p>
       </div>
 

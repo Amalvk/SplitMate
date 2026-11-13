@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MemberFormDialog } from '@/components/members/MemberFormDialog'
+import { isFirebaseConfigured } from '@/services/firebase/config'
 import { saveMemberAction } from '@/services/actions/memberActions'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
@@ -50,6 +51,9 @@ export function MemberMultiSelect({ selectedIds, onChange, className }: MemberMu
       createdAt: nowIso(),
     }
     await saveMemberAction(userId, member)
+    // Firebase mode only: otherwise the new member isn't in the store until the snapshot arrives,
+    // and "Add to group" can't find them. (Demo mode already added them in saveMemberAction.)
+    if (isFirebaseConfigured()) useDataStore.getState().cacheSavedMember(member)
     onChange([...selectedIds, member.id])
   }
 

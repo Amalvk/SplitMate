@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { isFirebaseConfigured } from '@/services/firebase/config'
+import { syncOwnProfileToGroupsAction } from '@/services/actions/groupActions'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
 import type { ActivityEntry, AppNotification, Expense, Group, Member, Settlement } from '@/types'
@@ -13,6 +14,21 @@ import type { ActivityEntry, AppNotification, Expense, Group, Member, Settlement
  */
 export function useFirebaseDataSync() {
   const userId = useAuthStore((s) => s.currentUser?.id)
+  const userName = useAuthStore((s) => s.currentUser?.name)
+  const userPhone = useAuthStore((s) => s.currentUser?.phone)
+
+  // The signed-in user's own account is the source of truth for their name: whatever a group
+  // snapshot or saved-member entry says, show the name they currently have.
+  useEffect(() => {
+    if (!isFirebaseConfigured() || !userId || !userName) return
+    const apply = () => {
+      const store = useDataStore.getState()
+      const me = store.members.find((m) => m.id === userId)
+      if (me && (me.name !== userName || me.phone !== userPhone)) store.updateMember({ ...me, name: userName, phone: userPhone })
+    }
+    apply()
+    return useDataStore.subscribe(apply)
+  }, [userId, userName, userPhone])
 
   useEffect(() => {
     if (!isFirebaseConfigured() || !userId) return
@@ -22,6 +38,7 @@ export function useFirebaseDataSync() {
     useDataStore.getState().clearRemoteData()
 
     let cancelled = false
+    let healedName: string | undefined
     const topLevelUnsubs: Array<() => void> = []
     const groupUnsubs = new Map<string, Array<() => void>>()
 
@@ -47,6 +64,16 @@ export function useFirebaseDataSync() {
         onSnapshot(query(collection(db, 'groups'), where('memberIds', 'array-contains', userId)), (snap) => {
           const groups = snap.docs.map((d) => d.data() as Group)
           useDataStore.getState().hydrateGroups(groups)
+
+          // Self-heal: if any group still carries an older copy of this user's name (e.g. they
+          // renamed before profile syncing existed), push the current profile into those groups.
+          const me = useAuthStore.getState().currentUser
+          if (me && healedName !== me.name && groups.some((g) => g.memberProfiles?.[me.id] && g.memberProfiles[me.id].name !== me.name)) {
+            healedName = me.name
+            void syncOwnProfileToGroupsAction(me).catch(() => {
+              healedName = undefined
+            })
+          }
 
           const currentIds = new Set(groups.map((g) => g.id))
 

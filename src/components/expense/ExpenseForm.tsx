@@ -3,12 +3,10 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PayerSelector } from '@/components/expense/PayerSelector'
 import { SplitEditor } from '@/components/expense/SplitEditor'
-import { EXPENSE_CATEGORY_LIST } from '@/constants/categories'
 import { addExpenseAction, updateExpenseAction } from '@/services/actions/expenseActions'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
@@ -19,7 +17,7 @@ import {
   calculatePercentageSplit,
   calculateShareSplit,
 } from '@/utils/calculations'
-import { formatDateTimeInput, nowIso } from '@/utils/date'
+import { nowIso } from '@/utils/date'
 import { minorToRupees, rupeesToMinor } from '@/utils/currency'
 import { generateId } from '@/utils/id'
 import type { Expense, ExpenseCategory, ExpensePayer, SplitType } from '@/types'
@@ -63,13 +61,10 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
   const [amountRupees, setAmountRupees] = useState(
     expense ? minorToRupees(expense.amountMinor) : draft?.amountMinor ? minorToRupees(draft.amountMinor) : '',
   )
-  const [category, setCategory] = useState<ExpenseCategory>(expense?.category ?? draft?.category ?? 'food')
-  const [date, setDate] = useState(formatDateTimeInput(expense?.date ?? nowIso()))
-  const [notes, setNotes] = useState(expense?.notes ?? '')
+  const [category] = useState<ExpenseCategory>(expense?.category ?? draft?.category ?? 'other')
 
   const amountMinor = rupeesToMinor(Number(amountRupees) || 0)
 
-  const [multiMode, setMultiMode] = useState((expense?.payers.length ?? draft?.payers?.length ?? 1) > 1)
   const [payers, setPayers] = useState<ExpensePayer[]>(
     expense?.payers ?? draft?.payers ?? [],
   )
@@ -80,13 +75,13 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
   )
   const [splitInputs, setSplitInputs] = useState<Record<string, number>>(expense?.split.inputs ?? draft?.splitInputs ?? {})
 
-  // Keep single-payer amount synced to the total when not in multi-payer mode.
+  // Keep the single payer's amount synced to the total.
   useEffect(() => {
-    if (!multiMode && payers.length === 1) {
+    if (payers.length === 1) {
       setPayers([{ memberId: payers[0].memberId, amountMinor }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountMinor, multiMode])
+  }, [amountMinor])
 
   useEffect(() => {
     if (!expense && !draft && group) {
@@ -126,8 +121,9 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
       title: title.trim(),
       amountMinor,
       category,
-      date: (date ? new Date(date) : new Date()).toISOString(),
-      notes: notes.trim() || undefined,
+      // New expenses are stamped with the moment they're added; edits keep their original date.
+      date: expense?.date ?? now,
+      notes: expense?.notes,
       receiptUrl: expense?.receiptUrl,
       payers,
       split: { type: splitType, participantIds, inputs: splitInputs, shares: splitResult.shares },
@@ -178,10 +174,23 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
         </div>
       )}
 
+      {group && (
+        <Card>
+          <CardContent className="p-4 sm:p-5">
+            <PayerSelector
+              members={groupMembers}
+              amountMinor={amountMinor}
+              payers={payers}
+              onChange={setPayers}
+            />
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardContent className="p-4 sm:p-5 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-4">
+            <div className="space-y-1.5">
               <Label htmlFor="expense-title">Title</Label>
               <Input id="expense-title" autoFocus placeholder="e.g. Dinner at Zoca" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
@@ -201,50 +210,8 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
               </div>
             </div>
           </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="expense-date">Date &amp; time</Label>
-              <Input id="expense-date" type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Category</Label>
-              <Select value={category} onValueChange={(v) => setCategory(v as ExpenseCategory)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EXPENSE_CATEGORY_LIST.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.emoji} {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="expense-notes">Notes (optional)</Label>
-            <Textarea id="expense-notes" placeholder="Any details worth remembering..." value={notes} onChange={(e) => setNotes(e.target.value)} />
-          </div>
         </CardContent>
       </Card>
-
-      {group && (
-        <Card>
-          <CardContent className="p-5">
-            <PayerSelector
-              members={groupMembers}
-              amountMinor={amountMinor}
-              payers={payers}
-              onChange={setPayers}
-              multiMode={multiMode}
-              onMultiModeChange={setMultiMode}
-            />
-          </CardContent>
-        </Card>
-      )}
 
       {group && (
         <Card>
@@ -270,7 +237,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
             Cancel
           </Button>
         )}
-        <Button type="submit" size="lg" className="flex-1" loading={saving}>
+        <Button type="submit" className="flex-1" loading={saving}>
           {expense ? 'Save changes' : 'Add Expense'}
         </Button>
       </div>

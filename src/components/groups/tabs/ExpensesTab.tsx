@@ -1,59 +1,41 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Plus, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ExpenseTimeline } from '@/components/expense/ExpenseTimeline'
-import { RecurringExpensesCard } from '@/components/groups/RecurringExpensesCard'
 import { EXPENSE_CATEGORY_LIST } from '@/constants/categories'
-import { ROUTES } from '@/constants/routes'
 import { useGroupExpenses } from '@/hooks/useGroupBalances'
 import { compareNewestFirst } from '@/utils/date'
 import { useDataStore } from '@/store/dataStore'
 import type { ExpenseCategory, Group } from '@/types'
 
-type SortKey = 'newest' | 'oldest' | 'highest' | 'lowest'
-
 export function ExpensesTab({ group }: { group: Group }) {
-  const navigate = useNavigate()
   const expenses = useGroupExpenses(group.id)
   const members = useDataStore((s) => s.members).filter((m) => group.memberIds.includes(m.id))
 
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ExpenseCategory | 'all'>('all')
   const [paidBy, setPaidBy] = useState<string | 'all'>('all')
-  const [sort, setSort] = useState<SortKey>('newest')
 
   const filtered = useMemo(() => {
     let list = expenses.filter((e) => e.title.toLowerCase().includes(query.toLowerCase()))
     if (category !== 'all') list = list.filter((e) => e.category === category)
     if (paidBy !== 'all') list = list.filter((e) => e.payers.some((p) => p.memberId === paidBy))
 
-    list = [...list].sort((a, b) => {
-      if (sort === 'newest') return compareNewestFirst(a, b)
-      if (sort === 'oldest') return compareNewestFirst(b, a)
-      if (sort === 'highest') return b.amountMinor - a.amountMinor
-      return a.amountMinor - b.amountMinor
-    })
+    list = [...list].sort(compareNewestFirst)
     return list
-  }, [expenses, query, category, paidBy, sort])
+  }, [expenses, query, category, paidBy])
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input placeholder="Search expenses..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
-        </div>
-        <Button size="sm" onClick={() => navigate(`${ROUTES.newExpense}?groupId=${group.id}`)}>
-          <Plus className="size-4" /> Add expense
-        </Button>
+      <div className="relative sm:max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Input placeholder="Search expenses..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         <Select value={category} onValueChange={(v) => setCategory(v as ExpenseCategory | 'all')}>
-          <SelectTrigger className="col-span-2 sm:col-span-1 sm:w-40"><SelectValue placeholder="Category" /></SelectTrigger>
+          <SelectTrigger className="sm:w-40"><SelectValue placeholder="Category" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {EXPENSE_CATEGORY_LIST.map((c) => (
@@ -72,20 +54,9 @@ export function ExpensesTab({ group }: { group: Group }) {
           </SelectContent>
         </Select>
 
-        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-          <SelectTrigger className="sm:w-36"><SelectValue placeholder="Sort" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest first</SelectItem>
-            <SelectItem value="oldest">Oldest first</SelectItem>
-            <SelectItem value="highest">Highest amount</SelectItem>
-            <SelectItem value="lowest">Lowest amount</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       <ExpenseTimeline expenses={filtered} />
-
-      <RecurringExpensesCard group={group} />
     </div>
   )
 }
