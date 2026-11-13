@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 
 const HIGHLIGHTS = [
   { emoji: '🧳', text: 'Trips, hostels, offices, events — one place for every group' },
-  { emoji: '🎙️', text: '"Amal paid 500 for everyone" — just say it' },
   { emoji: '✨', text: 'Smart settlements settle up in the fewest payments possible' },
 ]
 

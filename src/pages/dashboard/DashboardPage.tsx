@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Mic, Plus, Receipt, Sparkles, Users, Wallet } from 'lucide-react'
+import { ArrowRight, Plus, Receipt, Sparkles, Users, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatCard } from '@/components/common/StatCard'
@@ -14,7 +14,6 @@ import { buildInsights } from '@/utils/insights'
 
 const QUICK_ACTIONS = [
   { label: 'Add Expense', icon: Receipt, to: ROUTES.newExpense },
-  { label: 'Voice Expense', icon: Mic, to: `${ROUTES.newExpense}?mode=voice` },
   { label: 'New Group', icon: Users, to: ROUTES.newGroup },
   { label: 'Settle Up', icon: Wallet, to: ROUTES.settlements },
 ]

@@ -4,15 +4,9 @@ import type { ExpenseParser, GroupContext, ParsedExpenseResult } from './Expense
 import type { ExpenseCategory } from '@/types'
 
 const CATEGORY_KEYWORDS: Record<ExpenseCategory, string[]> = {
-  food: ['dinner', 'lunch', 'breakfast', 'food', 'meal', 'restaurant', 'pizza', 'snack', 'ice cream'],
-  travel: ['cab', 'taxi', 'uber', 'ola', 'flight', 'train', 'bus', 'auto', 'fuel', 'petrol'],
-  hotel: ['hotel', 'room', 'stay', 'resort', 'villa', 'hostel', 'rent'],
-  shopping: ['shopping', 'souvenir', 'clothes', 'store'],
-  utilities: ['wifi', 'electricity', 'water bill', 'internet', 'bill'],
-  entertainment: ['movie', 'tickets', 'entry', 'party', 'club', 'game'],
-  groceries: ['groceries', 'grocery', 'supermarket', 'vegetables'],
-  transport: ['transport', 'parking', 'toll'],
-  medical: ['medicine', 'pharmacy', 'doctor', 'hospital'],
+  drinks: ['drinks', 'drink', 'beer', 'wine', 'liquor', 'alcohol', 'cocktail', 'whisky', 'whiskey', 'vodka', 'rum', 'bar', 'pub', 'juice', 'coffee', 'tea'],
+  food: ['dinner', 'lunch', 'breakfast', 'food', 'meal', 'restaurant', 'pizza', 'snack', 'ice cream', 'groceries', 'grocery'],
+  travel: ['cab', 'taxi', 'uber', 'ola', 'flight', 'train', 'bus', 'auto', 'fuel', 'petrol', 'hotel', 'room', 'stay', 'resort', 'villa', 'hostel', 'parking', 'toll'],
   other: [],
 }
 

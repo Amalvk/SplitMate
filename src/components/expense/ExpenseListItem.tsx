@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Mic, PenLine } from 'lucide-react'
-import { EXPENSE_CATEGORIES } from '@/constants/categories'
+import { getExpenseCategory } from '@/constants/categories'
 import { ROUTES } from '@/constants/routes'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
@@ -11,7 +11,7 @@ export function ExpenseListItem({ expense }: { expense: Expense }) {
   const userId = useAuthStore((s) => s.currentUser?.id)
   const members = useDataStore((s) => s.members)
   const byId = Object.fromEntries(members.map((m) => [m.id, m]))
-  const categoryMeta = EXPENSE_CATEGORIES[expense.category]
+  const categoryMeta = getExpenseCategory(expense.category)
 
   const payerNames = expense.payers.map((p) => byId[p.memberId]?.name ?? 'Someone').join(' & ')
   const isPayer = userId ? expense.payers.some((p) => p.memberId === userId) : false

@@ -2,7 +2,7 @@ import { AlertTriangle, Sparkles } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { EXPENSE_CATEGORIES } from '@/constants/categories'
+import { getExpenseCategory } from '@/constants/categories'
 import type { Member } from '@/types'
 import type { ParsedExpenseResult } from '@/services/expenseParser'
 import { formatINR } from '@/utils/currency'
@@ -15,7 +15,7 @@ interface ParsedExpensePreviewProps {
 export function ParsedExpensePreview({ result, members }: ParsedExpensePreviewProps) {
   const byId = Object.fromEntries(members.map((m) => [m.id, m]))
   const payerName = result.payers[0] ? byId[result.payers[0].memberId]?.name : undefined
-  const categoryMeta = EXPENSE_CATEGORIES[result.category]
+  const categoryMeta = getExpenseCategory(result.category)
   const equalShare = result.splitType === 'equal' && result.participantIds.length > 0 ? Math.round(result.amountMinor / result.participantIds.length) : 0
 
   return (

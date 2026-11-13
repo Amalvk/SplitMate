@@ -1,6 +1,6 @@
 import { isWithinInterval, subMonths } from 'date-fns'
 import type { Expense, Group } from '@/types'
-import { EXPENSE_CATEGORIES } from '@/constants/categories'
+import { getExpenseCategory } from '@/constants/categories'
 import { formatINR } from '@/utils/currency'
 import { optimizeSettlements, calculateMemberBalances } from '@/utils/calculations'
 
@@ -32,7 +32,7 @@ export function buildInsights(groups: Group[], expenses: Expense[]): Insight[] {
   }
   const topCategory = [...byCategory.entries()].sort((a, b) => b[1] - a[1])[0]
   if (topCategory) {
-    const meta = EXPENSE_CATEGORIES[topCategory[0] as keyof typeof EXPENSE_CATEGORIES]
+    const meta = getExpenseCategory(topCategory[0])
     insights.push({
       emoji: meta?.emoji ?? '💡',
       text: `${meta?.label ?? 'This category'} is your biggest expense this month, at ${formatINR(topCategory[1], { whole: true })}.`,
@@ -79,7 +79,7 @@ export function buildInsights(groups: Group[], expenses: Expense[]): Insight[] {
     const top = [...byCat.entries()].sort((a, b) => b[1] - a[1])[0]
     if (top && total > 0) {
       const pct = Math.round((top[1] / total) * 100)
-      const meta = EXPENSE_CATEGORIES[top[0] as keyof typeof EXPENSE_CATEGORIES]
+      const meta = getExpenseCategory(top[0])
       if (pct >= 25) {
         insights.push({
           emoji: meta?.emoji ?? '📊',

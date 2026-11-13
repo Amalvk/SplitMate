@@ -3,7 +3,7 @@ import { format, isWithinInterval, subDays, subMonths } from 'date-fns'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState } from '@/components/common/EmptyState'
-import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_LIST } from '@/constants/categories'
+import { EXPENSE_CATEGORY_LIST, getExpenseCategory } from '@/constants/categories'
 import { useGroupExpenses } from '@/hooks/useGroupBalances'
 import { useDataStore } from '@/store/dataStore'
 import { formatINR } from '@/utils/currency'
@@ -167,7 +167,7 @@ export function AnalyticsTab({ group }: { group: Group }) {
                 {topExpenses.map((e, i) => (
                   <div key={e.id} className="flex items-center gap-3">
                     <span className="text-xs font-semibold text-muted-foreground w-4">{i + 1}</span>
-                    <span className="text-lg">{EXPENSE_CATEGORIES[e.category].emoji}</span>
+                    <span className="text-lg">{getExpenseCategory(e.category).emoji}</span>
                     <span className="text-sm font-medium flex-1 truncate">{e.title}</span>
                     <span className="text-sm font-semibold num-tabular">{formatINR(e.amountMinor)}</span>
                   </div>

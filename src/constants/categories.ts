@@ -20,15 +20,17 @@ export const GROUP_CATEGORY_LIST = Object.values(GROUP_CATEGORIES)
 
 export const EXPENSE_CATEGORIES: Record<ExpenseCategory, CategoryMeta> = {
   food: { value: 'food', label: 'Food', emoji: '🍕' },
+  drinks: { value: 'drinks', label: 'Drinks', emoji: '🍹' },
   travel: { value: 'travel', label: 'Travel', emoji: '🚕' },
-  hotel: { value: 'hotel', label: 'Hotel', emoji: '🏨' },
-  shopping: { value: 'shopping', label: 'Shopping', emoji: '🛍️' },
-  utilities: { value: 'utilities', label: 'Utilities', emoji: '💡' },
-  entertainment: { value: 'entertainment', label: 'Entertainment', emoji: '🎬' },
-  groceries: { value: 'groceries', label: 'Groceries', emoji: '🛒' },
-  transport: { value: 'transport', label: 'Transport', emoji: '🚌' },
-  medical: { value: 'medical', label: 'Medical', emoji: '💊' },
   other: { value: 'other', label: 'Other', emoji: '🧾' },
+}
+
+/**
+ * Safe lookup: expenses saved before a category was retired (hotel, medical, utilities, …) still
+ * exist in storage, so unknown values fall back to "Other" instead of crashing the UI.
+ */
+export function getExpenseCategory(category: string): CategoryMeta {
+  return EXPENSE_CATEGORIES[category as ExpenseCategory] ?? EXPENSE_CATEGORIES.other
 }
 
 export const EXPENSE_CATEGORY_LIST = Object.values(EXPENSE_CATEGORIES)

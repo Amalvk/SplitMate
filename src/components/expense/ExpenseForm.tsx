@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Camera, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,7 +22,6 @@ import {
 import { formatDateTimeInput, nowIso } from '@/utils/date'
 import { minorToRupees, rupeesToMinor } from '@/utils/currency'
 import { generateId } from '@/utils/id'
-import { cn } from '@/utils/cn'
 import type { Expense, ExpenseCategory, ExpensePayer, SplitType } from '@/types'
 
 export interface ExpenseDraft {
@@ -68,13 +66,12 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
   const [category, setCategory] = useState<ExpenseCategory>(expense?.category ?? draft?.category ?? 'food')
   const [date, setDate] = useState(formatDateTimeInput(expense?.date ?? nowIso()))
   const [notes, setNotes] = useState(expense?.notes ?? '')
-  const [receiptUrl, setReceiptUrl] = useState<string | undefined>(expense?.receiptUrl)
 
   const amountMinor = rupeesToMinor(Number(amountRupees) || 0)
 
   const [multiMode, setMultiMode] = useState((expense?.payers.length ?? draft?.payers?.length ?? 1) > 1)
   const [payers, setPayers] = useState<ExpensePayer[]>(
-    expense?.payers ?? draft?.payers ?? (userId ? [{ memberId: userId, amountMinor: amountMinor }] : []),
+    expense?.payers ?? draft?.payers ?? [],
   )
 
   const [splitType, setSplitType] = useState<SplitType>(expense?.split.type ?? draft?.splitType ?? 'equal')
@@ -94,15 +91,10 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
   useEffect(() => {
     if (!expense && !draft && group) {
       setParticipantIds(group.memberIds)
-      if (!multiMode) setPayers(userId ? [{ memberId: userId, amountMinor }] : [])
+      setPayers([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId])
-
-  function handleReceiptChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) setReceiptUrl(URL.createObjectURL(file))
-  }
 
   function computeSplitResult() {
     const relevant = Object.fromEntries(participantIds.map((id) => [id, splitInputs[id] ?? 0]))
@@ -119,6 +111,8 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
     if (!title.trim()) return toast.error('Give the expense a title.')
     if (amountMinor <= 0) return toast.error('Enter an amount greater than zero.')
 
+    if (payers.length === 0) return toast.error('Select who paid for this expense.')
+
     const payerCheck = calculateMultiplePayerExpense(payers, amountMinor)
     if (!payerCheck.valid) return toast.error(payerCheck.error ?? 'Check who paid.')
 
@@ -134,7 +128,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
       category,
       date: (date ? new Date(date) : new Date()).toISOString(),
       notes: notes.trim() || undefined,
-      receiptUrl,
+      receiptUrl: expense?.receiptUrl,
       payers,
       split: { type: splitType, participantIds, inputs: splitInputs, shares: splitResult.shares },
       createdBy: expense?.createdBy ?? userId,
@@ -233,28 +227,6 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
           <div className="space-y-1.5">
             <Label htmlFor="expense-notes">Notes (optional)</Label>
             <Textarea id="expense-notes" placeholder="Any details worth remembering..." value={notes} onChange={(e) => setNotes(e.target.value)} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Receipt (optional)</Label>
-            {receiptUrl ? (
-              <div className="relative w-28">
-                <img src={receiptUrl} alt="Receipt" className="h-28 w-28 rounded-lg object-cover border border-border" />
-                <button
-                  type="button"
-                  onClick={() => setReceiptUrl(undefined)}
-                  className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow"
-                >
-                  <X className="size-3.5" />
-                </button>
-              </div>
-            ) : (
-              <label className={cn('flex h-20 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border text-muted-foreground hover:bg-secondary/50')}>
-                <Camera className="size-5" />
-                <span className="text-[11px]">Add photo</span>
-                <input type="file" accept="image/*" className="hidden" onChange={handleReceiptChange} />
-              </label>
-            )}
           </div>
         </CardContent>
       </Card>

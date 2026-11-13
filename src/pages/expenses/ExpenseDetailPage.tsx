@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { ExpenseForm } from '@/components/expense/ExpenseForm'
-import { EXPENSE_CATEGORIES } from '@/constants/categories'
+import { getExpenseCategory } from '@/constants/categories'
 import { ROUTES } from '@/constants/routes'
 import { deleteExpenseAction } from '@/services/actions/expenseActions'
 import { useAuthStore } from '@/store/authStore'
@@ -31,7 +31,7 @@ export default function ExpenseDetailPage() {
 
   const group = groups.find((g) => g.id === expense.groupId)
   const byId = Object.fromEntries(members.map((m) => [m.id, m]))
-  const categoryMeta = EXPENSE_CATEGORIES[expense.category]
+  const categoryMeta = getExpenseCategory(expense.category)
 
   async function handleDelete() {
     await deleteExpenseAction(expense!, userId ?? '')

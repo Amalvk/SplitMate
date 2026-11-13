@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, BarChart3, Mic, Repeat, Sparkles, Users, Wallet } from 'lucide-react'
+import { ArrowRight, BarChart3, Repeat, Sparkles, Users, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { ROUTES } from '@/constants/routes'
@@ -9,7 +9,6 @@ import { formatINR } from '@/utils/currency'
 
 const FEATURES = [
   { icon: Sparkles, title: 'Smart splitting', desc: 'Equal, unequal, percentage or shares — the calculator handles every edge case, down to the paisa.' },
-  { icon: Mic, title: 'Voice expense entry', desc: '"Amal paid 500 for everyone" — just say it, review it, done.' },
   { icon: Wallet, title: 'Instant balances', desc: 'Always know who owes what, updated the moment an expense is added.' },
   { icon: BarChart3, title: 'Smart settlements', desc: 'Settle up with the fewest payments possible — not a spreadsheet of IOUs.' },
   { icon: Users, title: 'Reusable members', desc: 'Add someone once, reuse them across every trip, room or event.' },
@@ -38,13 +37,13 @@ export default function LandingPage() {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20 text-center">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-medium mb-6">
-            <Sparkles className="size-3.5" /> Now with voice-powered expense entry
+            <Sparkles className="size-3.5" /> Smart splits, instant balances
           </span>
           <h1 className="text-3xl min-[400px]:text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             Split expenses without the <span className="text-primary">spreadsheet headache.</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Track group expenses, understand who owes whom, and settle up effortlessly — even with your voice.
+            Track group expenses, understand who owes whom, and settle up effortlessly.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(ROUTES.login)}>

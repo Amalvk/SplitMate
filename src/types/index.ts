@@ -5,17 +5,7 @@ export type SplitType = 'equal' | 'unequal' | 'percentage' | 'shares'
 
 export type GroupCategory = 'travel' | 'hostel' | 'office' | 'food' | 'event' | 'wedding' | 'custom'
 
-export type ExpenseCategory =
-  | 'food'
-  | 'travel'
-  | 'hotel'
-  | 'shopping'
-  | 'utilities'
-  | 'entertainment'
-  | 'groceries'
-  | 'transport'
-  | 'medical'
-  | 'other'
+export type ExpenseCategory = 'food' | 'drinks' | 'travel' | 'other'
 
 export type SettlementStatus = 'pending' | 'partial' | 'paid'
 

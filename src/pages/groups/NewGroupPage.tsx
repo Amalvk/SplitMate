@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { MemberMultiSelect } from '@/components/members/MemberMultiSelect'
-import { GROUP_CATEGORY_LIST, GROUP_COLOR_THEMES } from '@/constants/categories'
+import { GROUP_COLOR_THEMES } from '@/constants/categories'
 import { ROUTES } from '@/constants/routes'
 import { createGroupAction } from '@/services/actions/groupActions'
 import { useAuthStore } from '@/store/authStore'
@@ -19,12 +19,10 @@ import { useDataStore } from '@/store/dataStore'
 import { generateId } from '@/utils/id'
 import { nowIso } from '@/utils/date'
 import { cn } from '@/utils/cn'
-import type { Group, GroupCategory, Member } from '@/types'
+import type { Group, Member } from '@/types'
 
 const schema = z.object({
   name: z.string().min(2, 'Give your group a name.'),
-  category: z.string(),
-  customCategoryLabel: z.string().optional(),
   description: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -41,9 +39,8 @@ export default function NewGroupPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', category: 'travel', description: '', startDate: '', endDate: '' },
+    defaultValues: { name: '', description: '', startDate: '', endDate: '' },
   })
-  const category = form.watch('category')
 
   async function onSubmit(values: FormValues) {
     if (!userId || !currentUser) return
@@ -55,8 +52,7 @@ export default function NewGroupPage() {
       id: generateId('grp'),
       name: values.name.trim(),
       description: values.description?.trim() || undefined,
-      category: values.category as GroupCategory,
-      customCategoryLabel: values.category === 'custom' ? values.customCategoryLabel?.trim() : undefined,
+      category: 'custom',
       colorTheme: color,
       startDate: values.startDate || undefined,
       endDate: values.endDate || undefined,
@@ -105,39 +101,6 @@ export default function NewGroupPage() {
               <Input id="group-name" autoFocus placeholder="e.g. Goa Trip 2026" {...form.register('name')} />
               {form.formState.errors.name && <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>}
             </div>
-
-            <div className="space-y-2">
-              <Label>Expense type</Label>
-              <Controller
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {GROUP_CATEGORY_LIST.map((cat) => (
-                      <button
-                        type="button"
-                        key={cat.value}
-                        onClick={() => field.onChange(cat.value)}
-                        className={cn(
-                          'flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-medium transition-colors',
-                          field.value === cat.value ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-secondary',
-                        )}
-                      >
-                        <span className="text-xl">{cat.emoji}</span>
-                        {cat.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              />
-            </div>
-
-            {category === 'custom' && (
-              <div className="space-y-1.5">
-                <Label htmlFor="custom-category">Custom category name</Label>
-                <Input id="custom-category" placeholder="e.g. Book Club" {...form.register('customCategoryLabel')} />
-              </div>
-            )}
 
             <div className="space-y-1.5">
               <Label htmlFor="description">Description (optional)</Label>

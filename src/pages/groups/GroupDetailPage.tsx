@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { ArrowLeft, Mic, Plus, Settings, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, Settings, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
@@ -83,11 +83,8 @@ export default function GroupDetailPage() {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
-          <Button variant="outline" onClick={() => navigate(`${ROUTES.newExpense}?groupId=${group.id}&mode=voice`)}>
-            <Mic className="size-4" /> Voice
-          </Button>
-          <Button onClick={() => navigate(`${ROUTES.newExpense}?groupId=${group.id}`)}>
+        <div className="flex gap-2 sm:shrink-0">
+          <Button className="w-full sm:w-auto" onClick={() => navigate(`${ROUTES.newExpense}?groupId=${group.id}`)}>
             <Plus className="size-4" /> Add Expense
           </Button>
         </div>

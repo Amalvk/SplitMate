@@ -41,21 +41,23 @@ export function PayerSelector({ members, amountMinor, payers, onChange, multiMod
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Label>Paid by</Label>
+        <Label>
+          Paid by <span className="text-destructive">*</span>
+        </Label>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Multiple payers</span>
           <Switch
             checked={multiMode}
             onCheckedChange={(checked) => {
               onMultiModeChange(checked)
-              onChange(checked ? [] : members[0] ? [{ memberId: members[0].id, amountMinor }] : [])
+              onChange([])
             }}
           />
         </div>
       </div>
 
       {!multiMode ? (
-        <Select value={payers[0]?.memberId} onValueChange={setSinglePayer}>
+        <Select value={payers[0]?.memberId ?? ''} onValueChange={setSinglePayer}>
           <SelectTrigger>
             <SelectValue placeholder="Who paid?" />
           </SelectTrigger>

@@ -45,7 +45,7 @@ export function RecurringExpensesCard({ group }: { group: Group }) {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { title: '', amount: 0, category: 'utilities', frequency: 'monthly' },
+    defaultValues: { title: '', amount: 0, category: 'other', frequency: 'monthly' },
   })
 
   function onSubmit(values: FormValues) {
