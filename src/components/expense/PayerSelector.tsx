@@ -20,9 +20,9 @@ export function PayerSelector({ members, amountMinor, payers, onChange }: PayerS
           <SelectValue placeholder="Who paid?" />
         </SelectTrigger>
         <SelectContent>
-          {members.map((m) => (
+          {members.map((m, i) => (
             <SelectItem key={m.id} value={m.id}>
-              {m.name}
+              {i + 1}. {m.name}
             </SelectItem>
           ))}
         </SelectContent>

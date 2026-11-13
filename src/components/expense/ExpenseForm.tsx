@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ import {
   calculateShareSplit,
 } from '@/utils/calculations'
 import { nowIso } from '@/utils/date'
+import { cn } from '@/utils/cn'
 import { minorToRupees, rupeesToMinor } from '@/utils/currency'
 import { generateId } from '@/utils/id'
 import type { Expense, ExpenseCategory, ExpensePayer, SplitType } from '@/types'
@@ -40,6 +42,13 @@ interface ExpenseFormProps {
   draft?: ExpenseDraft
   onSaved?: (expense: Expense) => void
   onCancel?: () => void
+}
+
+const SPLIT_LABELS: Record<SplitType, string> = {
+  equal: 'Split equally',
+  unequal: 'Split unequally',
+  percentage: 'Split by percentage',
+  shares: 'Split by shares',
 }
 
 export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }: ExpenseFormProps) {
@@ -69,6 +78,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
     expense?.payers ?? draft?.payers ?? [],
   )
 
+  const [splitOpen, setSplitOpen] = useState(false)
   const [splitType, setSplitType] = useState<SplitType>(expense?.split.type ?? draft?.splitType ?? 'equal')
   const [participantIds, setParticipantIds] = useState<string[]>(
     expense?.split.participantIds ?? draft?.participantIds ?? group?.memberIds ?? [],
@@ -112,7 +122,10 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
     if (!payerCheck.valid) return toast.error(payerCheck.error ?? 'Check who paid.')
 
     const splitResult = computeSplitResult()
-    if (!splitResult.valid) return toast.error(splitResult.error ?? 'Check the split.')
+    if (!splitResult.valid) {
+      setSplitOpen(true)
+      return toast.error(splitResult.error ?? 'Check the split.')
+    }
 
     const now = nowIso()
     const result: Expense = {
@@ -215,8 +228,23 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
 
       {group && (
         <Card>
-          <CardContent className="p-5">
-            <Label className="mb-3 block">Split between</Label>
+          <CardContent className="p-0">
+            <button
+              type="button"
+              onClick={() => setSplitOpen((o) => !o)}
+              aria-expanded={splitOpen}
+              className="flex w-full items-center justify-between gap-3 p-4 text-left sm:p-5"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium leading-none">Split between</p>
+                <p className="mt-1.5 truncate text-xs text-muted-foreground">
+                  {SPLIT_LABELS[splitType]} · {participantIds.length} {participantIds.length === 1 ? 'person' : 'people'}
+                </p>
+              </div>
+              <ChevronDown className={cn('size-5 shrink-0 text-muted-foreground transition-transform', splitOpen && 'rotate-180')} />
+            </button>
+            {splitOpen && (
+              <div className="border-t border-border p-4 sm:p-5">
             <SplitEditor
               members={groupMembers}
               amountMinor={amountMinor}
@@ -227,6 +255,8 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
               inputs={splitInputs}
               onInputsChange={setSplitInputs}
             />
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
