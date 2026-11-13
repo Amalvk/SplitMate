@@ -17,6 +17,24 @@ function buildMemberProfiles(memberIds: string[], allMembers: Member[]): Record<
   return profiles
 }
 
+/** Pushes the signed-in user's latest name/contact details into every group they belong to. */
+export async function syncOwnProfileToGroupsAction(user: { id: string; name: string; avatarColor: string; email?: string; phone?: string }) {
+  if (!isFirebaseConfigured()) {
+    const store = useDataStore.getState()
+    const self = store.members.find((m) => m.id === user.id || m.isSelf)
+    if (self) store.updateMember({ ...self, name: user.name, phone: user.phone })
+    return
+  }
+  const { firebaseGroupsRepository } = await import('@/services/repositories/firebase/data.repository')
+  await firebaseGroupsRepository.syncMemberProfile(user.id, {
+    id: user.id,
+    name: user.name,
+    avatarColor: user.avatarColor,
+    email: user.email,
+    phone: user.phone,
+  })
+}
+
 export async function createGroupAction(group: Group, allMembers: Member[]) {
   if (isFirebaseConfigured()) {
     const { firebaseGroupsRepository } = await import('@/services/repositories/firebase/data.repository')

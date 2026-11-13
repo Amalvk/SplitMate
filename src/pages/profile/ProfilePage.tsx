@@ -10,11 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { ROUTES } from '@/constants/routes'
+import { syncOwnProfileToGroupsAction } from '@/services/actions/groupActions'
 import { isFirebaseConfigured } from '@/services/firebase/config'
 import { useAuthStore } from '@/store/authStore'
-import { useDataStore } from '@/store/dataStore'
 import { useUiStore, type Theme } from '@/store/uiStore'
-import { getAvatarColor } from '@/utils/avatar'
 import { cn } from '@/utils/cn'
 
 const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
@@ -28,8 +27,6 @@ export default function ProfilePage() {
   const user = useAuthStore((s) => s.currentUser)
   const updateProfile = useAuthStore((s) => s.updateProfile)
   const logout = useAuthStore((s) => s.logout)
-  const updateMember = useDataStore((s) => s.updateMember)
-  const members = useDataStore((s) => s.members)
   const theme = useUiStore((s) => s.theme)
   const setTheme = useUiStore((s) => s.setTheme)
 
@@ -40,10 +37,8 @@ export default function ProfilePage() {
   async function handleSave() {
     try {
       await updateProfile({ name: name.trim(), phone: phone.trim() || undefined })
-      if (!isFirebaseConfigured()) {
-        const self = members.find((m) => m.isSelf)
-        if (self) updateMember({ ...self, name: name.trim(), avatarColor: getAvatarColor(name.trim()) })
-      }
+      const updated = useAuthStore.getState().currentUser
+      if (updated) await syncOwnProfileToGroupsAction(updated)
       toast.success('Profile updated')
     } catch (err) {
       toast.error('Couldn’t update profile', { description: err instanceof Error ? err.message : 'Please try again.' })

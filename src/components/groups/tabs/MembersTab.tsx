@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import QRCode from 'react-qr-code'
-import { Copy, MessageCircle, QrCode, Share2, Trash2, UserPlus } from 'lucide-react'
+import { Check, Copy, Link2, MessageCircle, QrCode, Share2, Trash2, UserPlus } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,21 @@ export function MembersTab({ group }: { group: Group }) {
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
 
   const inviteUrl = `${window.location.origin}/join/${group.id}`
+
+  // Short, readable label only — copy/share always use the full working link.
+  const inviteLabel = `${window.location.host}/join/${group.id.replace(/^grp_/, '').slice(0, 6)}…`
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  async function copyInvite() {
+    try {
+      await navigator.clipboard.writeText(inviteUrl)
+      setLinkCopied(true)
+      toast.success('Invite link copied')
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch {
+      toast.error('Couldn’t copy — long-press the link to copy it manually')
+    }
+  }
 
   const shareText = `Join "${group.name}" on SplitMate and add your expenses: ${inviteUrl}`
 
@@ -82,30 +97,26 @@ export function MembersTab({ group }: { group: Group }) {
                 <DialogTitle>Join {group.name}</DialogTitle>
                 <DialogDescription>Share this link or QR code with anyone you want to add.</DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col items-center gap-4 py-2">
-                <div className="rounded-xl border border-border p-4 bg-white">
-                  <QRCode value={inviteUrl} size={160} />
+              <div className="flex w-full min-w-0 flex-col items-center gap-4 py-2">
+                <div className="rounded-xl border border-border p-3 bg-white sm:p-4">
+                  <QRCode value={inviteUrl} size={160} className="size-40 max-w-full" />
                 </div>
-                <div className="flex w-full items-center gap-2">
-                  <code className="flex-1 truncate rounded-lg bg-secondary px-3 py-2 text-xs">{inviteUrl}</code>
-                  <Button
-                    size="icon"
-                    variant="secondary"
-                    onClick={() => {
-                      navigator.clipboard.writeText(inviteUrl)
-                      toast.success('Invite link copied')
-                    }}
-                  >
-                    <Copy className="size-4" />
+                <div className="flex w-full min-w-0 items-center gap-2 rounded-lg bg-secondary py-1 pl-3 pr-1">
+                  <Link2 className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 flex-1 truncate text-sm" title={inviteUrl}>
+                    {inviteLabel}
+                  </span>
+                  <Button size="icon" variant="ghost" aria-label="Copy invite link" className="shrink-0" onClick={copyInvite}>
+                    {linkCopied ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
                   </Button>
                 </div>
-                <div className="grid w-full grid-cols-2 gap-2">
-                  <Button asChild variant="outline">
+                <div className="grid w-full min-w-0 grid-cols-2 gap-2">
+                  <Button asChild variant="outline" className="min-w-0">
                     <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noreferrer">
                       <MessageCircle className="size-4" /> WhatsApp
                     </a>
                   </Button>
-                  <Button variant="outline" onClick={handleShare}>
+                  <Button variant="outline" className="min-w-0" onClick={handleShare}>
                     <Share2 className="size-4" /> Share…
                   </Button>
                 </div>
