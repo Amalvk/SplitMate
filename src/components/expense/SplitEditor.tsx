@@ -72,7 +72,7 @@ export function SplitEditor({
       <Tabs value={splitType} onValueChange={(v) => onSplitTypeChange(v as SplitType)}>
         <TabsList className="grid grid-cols-4 w-full">
           {SPLIT_TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
+            <TabsTrigger key={tab.value} value={tab.value} className="px-1 text-xs sm:px-3 sm:text-sm">
               {tab.label}
             </TabsTrigger>
           ))}
@@ -101,7 +101,7 @@ export function SplitEditor({
                     type="number"
                     min={0}
                     step="0.01"
-                    className="h-8 w-24 text-right"
+                    className="h-9 w-24 text-right sm:h-8"
                     value={inputs[member.id] ? minorToRupees(inputs[member.id]) : ''}
                     onChange={(e) => setInput(member.id, rupeesToMinor(Number(e.target.value) || 0))}
                   />

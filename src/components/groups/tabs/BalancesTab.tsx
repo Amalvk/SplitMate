@@ -28,9 +28,9 @@ export function BalancesTab({ group }: { group: Group }) {
               .map((b) => (
                 <div key={b.memberId} className="flex items-center gap-3">
                   <Avatar name={byId[b.memberId]?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium flex-1">{byId[b.memberId]?.name}</span>
+                  <span className="text-sm font-medium flex-1 min-w-0 truncate">{byId[b.memberId]?.name}</span>
                   <span
-                    className={`text-sm font-semibold num-tabular ${
+                    className={`text-sm font-semibold num-tabular text-right ${
                       b.netMinor > 0 ? 'text-success' : b.netMinor < 0 ? 'text-destructive' : 'text-muted-foreground'
                     }`}
                   >
@@ -54,16 +54,20 @@ export function BalancesTab({ group }: { group: Group }) {
             </p>
             <div className="space-y-2">
               {suggestions.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 rounded-xl bg-background border border-border p-3">
-                  <Avatar name={byId[s.fromMemberId]?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium">{byId[s.fromMemberId]?.name}</span>
-                  <ArrowRight className="size-4 text-muted-foreground" />
-                  <Avatar name={byId[s.toMemberId]?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium flex-1">{byId[s.toMemberId]?.name}</span>
-                  <span className="text-sm font-semibold num-tabular">{formatINR(s.amountMinor)}</span>
-                  <Button size="sm" variant="outline" onClick={() => setActive(s)}>
-                    Settle
-                  </Button>
+                <div key={i} className="flex flex-col gap-2 rounded-xl bg-background border border-border p-3 sm:flex-row sm:items-center sm:gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                    <Avatar name={byId[s.fromMemberId]?.name ?? '?'} size="sm" />
+                    <span className="text-sm font-medium truncate">{byId[s.fromMemberId]?.name}</span>
+                    <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+                    <Avatar name={byId[s.toMemberId]?.name ?? '?'} size="sm" />
+                    <span className="text-sm font-medium flex-1 min-w-0 truncate">{byId[s.toMemberId]?.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold num-tabular">{formatINR(s.amountMinor)}</span>
+                    <Button size="sm" variant="outline" onClick={() => setActive(s)}>
+                      Settle
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

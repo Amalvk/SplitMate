@@ -26,12 +26,12 @@ export function ParsedExpensePreview({ result, members }: ParsedExpensePreviewPr
           <span className="text-sm font-semibold">I understood</span>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
             <span className="text-xl">{categoryMeta.emoji}</span>
-            <span className="font-semibold text-lg">{result.title}</span>
+            <span className="font-semibold text-lg truncate">{result.title}</span>
           </div>
-          <span className="text-xl font-bold num-tabular">{formatINR(result.amountMinor)}</span>
+          <span className="text-xl font-bold num-tabular shrink-0">{formatINR(result.amountMinor)}</span>
         </div>
 
         <div className="space-y-1.5">

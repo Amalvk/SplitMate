@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase/client'
 import type {
   ActivityRepository,
@@ -47,6 +47,13 @@ export const firebaseGroupsRepository: GroupsRepository = {
   async syncMemberProfile(memberId, profile: MemberProfileLite) {
     const snap = await getDocs(query(collection(getFirebaseDb(), 'groups'), where('memberIds', 'array-contains', memberId)))
     await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { [`memberProfiles.${memberId}`]: profile })))
+  },
+  async joinGroup(groupId, profile) {
+    await updateDoc(doc(getFirebaseDb(), 'groups', groupId), {
+      memberIds: arrayUnion(profile.id),
+      [`memberProfiles.${profile.id}`]: profile,
+      updatedAt: new Date().toISOString(),
+    })
   },
 }
 

@@ -42,7 +42,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}</p>
@@ -67,8 +67,8 @@ export default function NotificationsPage() {
                 n.read ? 'hover:bg-secondary/50' : 'bg-accent/50 hover:bg-accent/70',
               )}
             >
-              <span className="text-xl leading-none mt-0.5">{NOTIF_ICON[n.type] ?? '🔔'}</span>
-              <div className="min-w-0 flex-1">
+              <span className="text-xl leading-none mt-0.5 shrink-0">{NOTIF_ICON[n.type] ?? '🔔'}</span>
+              <div className="min-w-0 flex-1 break-words">
                 <p className={cn('text-sm', !n.read && 'font-semibold')}>{n.title}</p>
                 <p className="text-sm text-muted-foreground">{n.body}</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">{formatRelative(n.createdAt)}</p>
@@ -84,8 +84,8 @@ export default function NotificationsPage() {
           <h2 className="font-semibold">Notification preferences</h2>
           {PREF_LABELS.map((pref, i) => (
             <div key={pref.key}>
-              <div className="flex items-center justify-between">
-                <Label htmlFor={pref.key}>{pref.label}</Label>
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor={pref.key} className="flex-1">{pref.label}</Label>
                 <Switch id={pref.key} checked={prefs[pref.key]} onCheckedChange={(v) => setNotificationPref(pref.key, v)} />
               </div>
               {i < PREF_LABELS.length - 1 && <Separator className="mt-4" />}

@@ -83,6 +83,7 @@ export default function MembersPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Save people once, reuse them across every group.</p>
         </div>
         <Button
+          className="w-full sm:w-auto"
           onClick={() => {
             setEditingMember(null)
             setFormOpen(true)
@@ -92,7 +93,7 @@ export default function MembersPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input placeholder="Search members..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
       </div>

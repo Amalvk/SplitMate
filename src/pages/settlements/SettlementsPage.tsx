@@ -84,10 +84,10 @@ export default function SettlementsPage() {
           <div className="space-y-2">
             {owe.map((item, i) => (
               <Card key={i}>
-                <CardContent className="p-4 flex items-center gap-3">
+                <CardContent className="p-4 flex flex-wrap items-center gap-x-3 gap-y-2">
                   <Avatar name={byId[item.memberId]?.name ?? '?'} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">{byId[item.memberId]?.name}</p>
+                  <div className="flex-1 min-w-[7rem]">
+                    <p className="font-medium truncate">{byId[item.memberId]?.name}</p>
                     <p className="text-xs text-muted-foreground">{item.groupName}</p>
                   </div>
                   <span className="font-bold num-tabular text-destructive">{formatINR(item.amountMinor)}</span>
@@ -111,10 +111,10 @@ export default function SettlementsPage() {
           <div className="space-y-2">
             {receive.map((item, i) => (
               <Card key={i}>
-                <CardContent className="p-4 flex items-center gap-3">
+                <CardContent className="p-4 flex flex-wrap items-center gap-x-3 gap-y-2">
                   <Avatar name={byId[item.memberId]?.name ?? '?'} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">{byId[item.memberId]?.name}</p>
+                  <div className="flex-1 min-w-[7rem]">
+                    <p className="font-medium truncate">{byId[item.memberId]?.name}</p>
                     <p className="text-xs text-muted-foreground">{item.groupName}</p>
                   </div>
                   <span className="font-bold num-tabular text-success">{formatINR(item.amountMinor)}</span>
@@ -140,9 +140,9 @@ export default function SettlementsPage() {
           <div className="space-y-2">
             {history.map((s) => (
               <Card key={s.id}>
-                <CardContent className="p-4 flex items-center gap-3">
+                <CardContent className="p-4 flex flex-wrap items-center gap-x-3 gap-y-2">
                   <Avatar name={byId[s.fromMemberId]?.name ?? '?'} size="sm" />
-                  <div className="flex-1 min-w-0 text-sm">
+                  <div className="flex-1 min-w-[9rem] text-sm">
                     <span className="font-medium">{byId[s.fromMemberId]?.name}</span> paid{' '}
                     <span className="font-medium">{byId[s.toMemberId]?.name}</span>
                     <p className="text-xs text-muted-foreground">{formatRelative(s.createdAt)} {s.note && `· ${s.note}`}</p>

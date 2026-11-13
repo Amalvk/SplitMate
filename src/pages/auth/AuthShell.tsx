@@ -9,7 +9,7 @@ const HIGHLIGHTS = [
 
 export function AuthShell({ children, step }: { children: ReactNode; step?: string }) {
   return (
-    <div className="min-h-screen w-full grid lg:grid-cols-2 bg-background">
+    <div className="min-h-dvh w-full grid lg:grid-cols-2 bg-background">
       <div className="hidden lg:flex flex-col justify-between p-12 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute -right-24 -top-24 size-96 rounded-full bg-white/10" />
         <div className="absolute -left-16 bottom-0 size-72 rounded-full bg-white/10" />

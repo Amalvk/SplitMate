@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { useAuthStore } from '@/store/authStore'
 import { useGroupBalances, useGroupExpenses } from '@/hooks/useGroupBalances'
 import { formatINR } from '@/utils/currency'
-import { formatFriendlyDate } from '@/utils/date'
+import { compareNewestFirst, formatFriendlyDate } from '@/utils/date'
 import type { Group } from '@/types'
 
 export function GroupCard({ group }: { group: Group }) {
@@ -15,7 +15,7 @@ export function GroupCard({ group }: { group: Group }) {
   const { balances, totalSpent } = useGroupBalances(group.id, group.memberIds)
   const myBalance = balances.find((b) => b.memberId === userId)
   const categoryMeta = GROUP_CATEGORIES[group.category]
-  const lastActivity = expenses[0]?.date
+  const lastActivity = [...expenses].sort(compareNewestFirst)[0]?.date
 
   return (
     <Link to={ROUTES.group(group.id)}>

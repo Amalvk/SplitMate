@@ -24,14 +24,14 @@ export function StatCard({ label, value, icon: Icon, tone = 'default', hint, del
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay }}>
       <Card className="h-full">
-        <CardContent className="p-5 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">{label}</span>
-            <div className={cn('flex size-8 items-center justify-center rounded-lg', TONE_CLASSES[tone])}>
+        <CardContent className="p-4 sm:p-5 flex flex-col gap-2 sm:gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <span className="min-w-0 text-xs leading-snug text-muted-foreground sm:text-sm">{label}</span>
+            <div className={cn('flex size-8 shrink-0 items-center justify-center rounded-lg', TONE_CLASSES[tone])}>
               <Icon className="size-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold tracking-tight num-tabular">{value}</div>
+          <div className="text-xl sm:text-2xl font-bold tracking-tight num-tabular truncate">{value}</div>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
         </CardContent>
       </Card>

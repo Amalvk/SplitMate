@@ -26,8 +26,8 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
+    <div className="min-h-dvh bg-background">
+      <header className="max-w-6xl mx-auto flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex items-center gap-2">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">S</div>
           <span className="font-semibold text-lg tracking-tight">SplitMate</span>
@@ -35,22 +35,22 @@ export default function LandingPage() {
         <Button onClick={() => navigate(ROUTES.login)}>Sign in</Button>
       </header>
 
-      <section className="max-w-4xl mx-auto px-6 pt-12 pb-20 text-center">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20 text-center">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-medium mb-6">
             <Sparkles className="size-3.5" /> Now with voice-powered expense entry
           </span>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
+          <h1 className="text-3xl min-[400px]:text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             Split expenses without the <span className="text-primary">spreadsheet headache.</span>
           </h1>
-          <p className="mt-5 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Track group expenses, understand who owes whom, and settle up effortlessly — even with your voice.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button size="lg" onClick={() => navigate(ROUTES.login)}>
+            <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(ROUTES.login)}>
               Start Splitting <ArrowRight className="size-4" />
             </Button>
-            <Button size="lg" variant="outline" onClick={handleTryDemo}>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto" onClick={handleTryDemo}>
               Try Demo
             </Button>
           </div>
@@ -60,7 +60,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="mt-16 mx-auto max-w-lg rounded-2xl border border-border bg-card shadow-xl p-5 text-left"
+          className="mt-12 sm:mt-16 mx-auto max-w-lg rounded-2xl border border-border bg-card shadow-xl p-5 text-left"
         >
           <div className="flex items-center justify-between mb-4">
             <span className="font-semibold">Goa Trip 2026</span>
@@ -84,7 +84,7 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 pb-24">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map((f, i) => (
             <motion.div
@@ -105,7 +105,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border px-4 py-8 pb-[calc(2rem+env(safe-area-inset-bottom))] text-center text-sm text-muted-foreground">
         SplitMate — Spend together. Settle smarter.
       </footer>
     </div>

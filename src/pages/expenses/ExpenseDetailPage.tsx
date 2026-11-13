@@ -12,7 +12,7 @@ import { ROUTES } from '@/constants/routes'
 import { deleteExpenseAction } from '@/services/actions/expenseActions'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
-import { formatDateLong } from '@/utils/date'
+import { formatDateTimeLong } from '@/utils/date'
 import { formatINR } from '@/utils/currency'
 
 export default function ExpenseDetailPage() {
@@ -57,18 +57,18 @@ export default function ExpenseDetailPage() {
       </Button>
 
       <Card>
-        <CardContent className="p-6 space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
+        <CardContent className="p-4 sm:p-6 space-y-6">
+          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-2xl">{categoryMeta.emoji}</div>
               <div>
                 <h1 className="text-xl font-bold">{expense.title}</h1>
                 <p className="text-sm text-muted-foreground">
-                  {formatDateLong(expense.date)} · {group?.name}
+                  {formatDateTimeLong(expense.date)} · {group?.name}
                 </p>
               </div>
             </div>
-            <span className="text-2xl font-bold num-tabular">{formatINR(expense.amountMinor)}</span>
+            <span className="text-2xl font-bold num-tabular sm:ml-auto">{formatINR(expense.amountMinor)}</span>
           </div>
 
           <div>
@@ -92,7 +92,7 @@ export default function ExpenseDetailPage() {
               {expense.split.participantIds.map((id) => (
                 <div key={id} className="flex items-center gap-3 px-3 py-2.5">
                   <Avatar name={byId[id]?.name ?? '?'} size="sm" />
-                  <span className="text-sm font-medium flex-1">{byId[id]?.name}</span>
+                  <span className="text-sm font-medium flex-1 min-w-0 truncate">{byId[id]?.name}</span>
                   <span className="text-sm font-semibold num-tabular">{formatINR(expense.split.shares[id] ?? 0)}</span>
                 </div>
               ))}

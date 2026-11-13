@@ -14,6 +14,7 @@ import { PageLoader } from '@/components/common/PageLoader'
 const LandingPage = lazy(() => import('@/pages/landing/LandingPage'))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 
+const JoinGroupPage = lazy(() => import('@/pages/groups/JoinGroupPage'))
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'))
 
 const GroupsPage = lazy(() => import('@/pages/groups/GroupsPage'))
@@ -43,6 +44,8 @@ function AppRoutes() {
           <Route path={ROUTES.landing} element={<LandingPage />} />
           <Route path={ROUTES.login} element={<LoginPage />} />
         </Route>
+
+        <Route path="/join/:groupId" element={<JoinGroupPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>

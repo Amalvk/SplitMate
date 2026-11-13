@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { ExpenseListItem } from '@/components/expense/ExpenseListItem'
 import { EmptyState } from '@/components/common/EmptyState'
-import { formatFriendlyDate } from '@/utils/date'
+import { compareNewestFirst, formatFriendlyDate } from '@/utils/date'
 import type { Expense } from '@/types'
 
 export function ExpenseTimeline({ expenses }: { expenses: Expense[] }) {
   const groups = useMemo(() => {
-    const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    const sorted = [...expenses].sort(compareNewestFirst)
     const map = new Map<string, Expense[]>()
     for (const expense of sorted) {
       const label = formatFriendlyDate(expense.date)

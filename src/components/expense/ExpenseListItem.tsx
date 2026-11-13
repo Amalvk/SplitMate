@@ -22,7 +22,7 @@ export function ExpenseListItem({ expense }: { expense: Expense }) {
   return (
     <Link
       to={ROUTES.expense(expense.id)}
-      className="flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-secondary/60 transition-colors"
+      className="flex items-center gap-3 rounded-xl px-2 py-3 sm:px-3 hover:bg-secondary/60 transition-colors"
     >
       <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-xl">{categoryMeta.emoji}</div>
       <div className="min-w-0 flex-1">
@@ -35,7 +35,7 @@ export function ExpenseListItem({ expense }: { expense: Expense }) {
           {payerNames} paid {formatINR(expense.amountMinor)} · {expense.split.participantIds.length} people
         </p>
       </div>
-      <div className="text-right shrink-0">
+      <div className="max-w-[38%] shrink-0 text-right leading-tight sm:max-w-none">
         {netForMe === 0 ? (
           <span className="text-xs text-muted-foreground">Not involved</span>
         ) : netForMe > 0 ? (

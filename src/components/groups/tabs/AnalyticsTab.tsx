@@ -116,13 +116,13 @@ export function AnalyticsTab({ group }: { group: Group }) {
       ) : (
         <>
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <h3 className="font-semibold mb-4">Spending by category</h3>
               <ResponsiveContainer width="100%" height={Math.max(categoryData.length * 42, 100)}>
-                <BarChart data={categoryData} layout="vertical" margin={{ left: 8, right: 24 }}>
+                <BarChart data={categoryData} layout="vertical" margin={{ left: 0, right: 48 }}>
                   <CartesianGrid horizontal={false} stroke="var(--color-border)" />
                   <XAxis type="number" hide />
-                  <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={112} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--color-secondary)' }} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={20} label={{ position: 'right', formatter: (v: unknown) => formatINR(Number(v), { whole: true }), fontSize: 11, fill: 'var(--color-foreground)' }} />
                 </BarChart>
@@ -131,7 +131,7 @@ export function AnalyticsTab({ group }: { group: Group }) {
           </Card>
 
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <h3 className="font-semibold mb-4">Spending over time</h3>
               <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={timeData} margin={{ left: -12 }}>
@@ -146,13 +146,13 @@ export function AnalyticsTab({ group }: { group: Group }) {
           </Card>
 
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <h3 className="font-semibold mb-4">Member contribution</h3>
               <ResponsiveContainer width="100%" height={Math.max(memberData.length * 42, 100)}>
-                <BarChart data={memberData} layout="vertical" margin={{ left: 8, right: 24 }}>
+                <BarChart data={memberData} layout="vertical" margin={{ left: 0, right: 48 }}>
                   <CartesianGrid horizontal={false} stroke="var(--color-border)" />
                   <XAxis type="number" hide />
-                  <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={76} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} axisLine={false} tickLine={false} />
                   <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--color-secondary)' }} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={20} label={{ position: 'right', formatter: (v: unknown) => formatINR(Number(v), { whole: true }), fontSize: 11, fill: 'var(--color-foreground)' }} />
                 </BarChart>
@@ -161,7 +161,7 @@ export function AnalyticsTab({ group }: { group: Group }) {
           </Card>
 
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <h3 className="font-semibold mb-3">Top expenses</h3>
               <div className="space-y-2.5">
                 {topExpenses.map((e, i) => (

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import QRCode from 'react-qr-code'
-import { Copy, QrCode, Trash2, UserPlus } from 'lucide-react'
+import { Copy, MessageCircle, QrCode, Share2, Trash2, UserPlus } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,21 @@ export function MembersTab({ group }: { group: Group }) {
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
 
   const inviteUrl = `${window.location.origin}/join/${group.id}`
+
+  const shareText = `Join "${group.name}" on SplitMate and add your expenses: ${inviteUrl}`
+
+  async function handleShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `Join ${group.name}`, text: `Join "${group.name}" on SplitMate and add your expenses.`, url: inviteUrl })
+      } catch {
+        // user dismissed the share sheet
+      }
+    } else {
+      await navigator.clipboard.writeText(inviteUrl)
+      toast.success('Invite link copied')
+    }
+  }
 
   async function handleAddSelected() {
     const newIds = pendingAdd.filter((id) => !group.memberIds.includes(id))
@@ -53,7 +68,7 @@ export function MembersTab({ group }: { group: Group }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold">{groupMembers.length} members</h3>
         <div className="flex gap-2">
           <Dialog>
@@ -82,6 +97,16 @@ export function MembersTab({ group }: { group: Group }) {
                     }}
                   >
                     <Copy className="size-4" />
+                  </Button>
+                </div>
+                <div className="grid w-full grid-cols-2 gap-2">
+                  <Button asChild variant="outline">
+                    <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noreferrer">
+                      <MessageCircle className="size-4" /> WhatsApp
+                    </a>
+                  </Button>
+                  <Button variant="outline" onClick={handleShare}>
+                    <Share2 className="size-4" /> Share…
                   </Button>
                 </div>
               </div>

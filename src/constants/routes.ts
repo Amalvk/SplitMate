@@ -2,6 +2,8 @@ export const ROUTES = {
   landing: '/',
   login: '/login',
 
+  join: (id: string) => `/join/${id}`,
+
   dashboard: '/dashboard',
 
   groups: '/groups',

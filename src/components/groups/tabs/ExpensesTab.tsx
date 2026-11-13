@@ -9,6 +9,7 @@ import { RecurringExpensesCard } from '@/components/groups/RecurringExpensesCard
 import { EXPENSE_CATEGORY_LIST } from '@/constants/categories'
 import { ROUTES } from '@/constants/routes'
 import { useGroupExpenses } from '@/hooks/useGroupBalances'
+import { compareNewestFirst } from '@/utils/date'
 import { useDataStore } from '@/store/dataStore'
 import type { ExpenseCategory, Group } from '@/types'
 
@@ -30,8 +31,8 @@ export function ExpensesTab({ group }: { group: Group }) {
     if (paidBy !== 'all') list = list.filter((e) => e.payers.some((p) => p.memberId === paidBy))
 
     list = [...list].sort((a, b) => {
-      if (sort === 'newest') return new Date(b.date).getTime() - new Date(a.date).getTime()
-      if (sort === 'oldest') return new Date(a.date).getTime() - new Date(b.date).getTime()
+      if (sort === 'newest') return compareNewestFirst(a, b)
+      if (sort === 'oldest') return compareNewestFirst(b, a)
       if (sort === 'highest') return b.amountMinor - a.amountMinor
       return a.amountMinor - b.amountMinor
     })
@@ -41,7 +42,7 @@ export function ExpensesTab({ group }: { group: Group }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input placeholder="Search expenses..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
         </div>
@@ -50,9 +51,9 @@ export function ExpensesTab({ group }: { group: Group }) {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         <Select value={category} onValueChange={(v) => setCategory(v as ExpenseCategory | 'all')}>
-          <SelectTrigger className="w-40"><SelectValue placeholder="Category" /></SelectTrigger>
+          <SelectTrigger className="col-span-2 sm:col-span-1 sm:w-40"><SelectValue placeholder="Category" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {EXPENSE_CATEGORY_LIST.map((c) => (
@@ -62,7 +63,7 @@ export function ExpensesTab({ group }: { group: Group }) {
         </Select>
 
         <Select value={paidBy} onValueChange={setPaidBy}>
-          <SelectTrigger className="w-36"><SelectValue placeholder="Paid by" /></SelectTrigger>
+          <SelectTrigger className="sm:w-36"><SelectValue placeholder="Paid by" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Paid by anyone</SelectItem>
             {members.map((m) => (
@@ -72,7 +73,7 @@ export function ExpensesTab({ group }: { group: Group }) {
         </Select>
 
         <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-          <SelectTrigger className="w-36"><SelectValue placeholder="Sort" /></SelectTrigger>
+          <SelectTrigger className="sm:w-36"><SelectValue placeholder="Sort" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="newest">Newest first</SelectItem>
             <SelectItem value="oldest">Oldest first</SelectItem>

@@ -53,6 +53,9 @@ export const localRepository: DataRepository = {
     async deleteGroup(groupId) {
       useDataStore.getState().deleteGroup(groupId)
     },
+    async joinGroup(groupId, profile) {
+      useDataStore.getState().addMemberToGroup(groupId, profile.id)
+    },
     async syncMemberProfile() {
       // No-op: demo mode has no memberProfiles snapshot — group rosters already read live from
       // the single shared `members` array in the store.

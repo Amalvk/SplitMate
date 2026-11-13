@@ -79,3 +79,23 @@ export async function removeMemberFromGroupAction(group: Group, memberId: string
   }
   useDataStore.getState().removeMemberFromGroup(group.id, memberId)
 }
+
+/** Fetches a group by id straight from Firestore (the viewer may not be a member yet). Firebase mode only. */
+export async function fetchGroupForInvite(groupId: string): Promise<Group | null> {
+  const { firebaseGroupsRepository } = await import('@/services/repositories/firebase/data.repository')
+  return firebaseGroupsRepository.getGroup(groupId)
+}
+
+/** Adds the signed-in user to a group they opened an invite link for. */
+export async function joinGroupAction(groupId: string, profile: MemberProfileLite) {
+  if (isFirebaseConfigured()) {
+    const { firebaseGroupsRepository } = await import('@/services/repositories/firebase/data.repository')
+    await firebaseGroupsRepository.joinGroup(groupId, profile)
+    return
+  }
+  const store = useDataStore.getState()
+  if (!store.members.some((m) => m.id === profile.id)) {
+    store.saveMember({ ...profile, createdAt: nowIso() })
+  }
+  store.addMemberToGroup(groupId, profile.id)
+}

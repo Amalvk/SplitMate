@@ -1,3 +1,4 @@
+import { compareNewestFirst } from '@/utils/date'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
@@ -15,7 +16,7 @@ export function OverviewTab({ group }: { group: Group }) {
   const { balances, suggestions, totalSpent } = useGroupBalances(group.id, group.memberIds)
   const members = useDataStore((s) => s.members)
   const byId = Object.fromEntries(members.map((m) => [m.id, m]))
-  const recent = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+  const recent = [...expenses].sort(compareNewestFirst).slice(0, 5)
 
   return (
     <div className="space-y-6">

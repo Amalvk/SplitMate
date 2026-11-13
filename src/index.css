@@ -198,6 +198,16 @@
 
   html {
     color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  button,
+  a,
+  [role='tab'],
+  [role='combobox'] {
+    touch-action: manipulation;
   }
 
   html.dark {
@@ -205,6 +215,7 @@
   }
 
   body {
+    overflow-x: hidden;
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: 'cv11', 'ss01';
   }

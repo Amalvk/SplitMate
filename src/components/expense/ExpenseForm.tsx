@@ -20,7 +20,7 @@ import {
   calculatePercentageSplit,
   calculateShareSplit,
 } from '@/utils/calculations'
-import { formatDateInput, nowIso } from '@/utils/date'
+import { formatDateTimeInput, nowIso } from '@/utils/date'
 import { minorToRupees, rupeesToMinor } from '@/utils/currency'
 import { generateId } from '@/utils/id'
 import { cn } from '@/utils/cn'
@@ -66,7 +66,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
     expense ? minorToRupees(expense.amountMinor) : draft?.amountMinor ? minorToRupees(draft.amountMinor) : '',
   )
   const [category, setCategory] = useState<ExpenseCategory>(expense?.category ?? draft?.category ?? 'food')
-  const [date, setDate] = useState(expense ? formatDateInput(expense.date) : formatDateInput(nowIso()))
+  const [date, setDate] = useState(formatDateTimeInput(expense?.date ?? nowIso()))
   const [notes, setNotes] = useState(expense?.notes ?? '')
   const [receiptUrl, setReceiptUrl] = useState<string | undefined>(expense?.receiptUrl)
 
@@ -132,7 +132,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
       title: title.trim(),
       amountMinor,
       category,
-      date: new Date(date).toISOString(),
+      date: (date ? new Date(date) : new Date()).toISOString(),
       notes: notes.trim() || undefined,
       receiptUrl,
       payers,
@@ -185,9 +185,9 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
       )}
 
       <Card>
-        <CardContent className="p-5 space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 space-y-1.5">
+        <CardContent className="p-4 sm:p-5 space-y-4">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="expense-title">Title</Label>
               <Input id="expense-title" autoFocus placeholder="e.g. Dinner at Zoca" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
@@ -208,10 +208,10 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="expense-date">Date</Label>
-              <Input id="expense-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Label htmlFor="expense-date">Date &amp; time</Label>
+              <Input id="expense-date" type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label>Category</Label>

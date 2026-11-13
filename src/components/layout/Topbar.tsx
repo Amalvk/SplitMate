@@ -19,7 +19,7 @@ export function Topbar() {
   const ThemeIcon = THEME_ICON[theme]
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/85 px-4 backdrop-blur lg:px-8">
+    <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-border bg-background/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur sm:h-[calc(4rem+env(safe-area-inset-top))] lg:px-8">
       <div className="lg:hidden flex items-center gap-2">
         <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">S</div>
         <span className="font-semibold tracking-tight">SplitMate</span>

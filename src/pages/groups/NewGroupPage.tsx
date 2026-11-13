@@ -144,7 +144,7 @@ export default function NewGroupPage() {
               <Textarea id="description" placeholder="What's this group for?" {...form.register('description')} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="start-date">Start date</Label>
                 <Input id="start-date" type="date" {...form.register('startDate')} />
@@ -157,13 +157,13 @@ export default function NewGroupPage() {
 
             <div className="space-y-2">
               <Label>Theme color</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-3">
                 {GROUP_COLOR_THEMES.map((c) => (
                   <button
                     type="button"
                     key={c}
                     onClick={() => setColor(c)}
-                    className={cn('size-8 rounded-full border-2 transition-transform', color === c ? 'scale-110 border-foreground' : 'border-transparent')}
+                    className={cn('size-9 rounded-full border-2 transition-transform sm:size-8', color === c ? 'scale-110 border-foreground' : 'border-transparent')}
                     style={{ backgroundColor: c }}
                     aria-label={`Choose color ${c}`}
                   />

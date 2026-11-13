@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Mic, Plus, ReceiptText, UserPlus, Users, Wallet } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -16,6 +16,10 @@ const ACTIONS = [
 export function Fab() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  // On form screens the button would sit on top of the Save/Cancel actions.
+  if (pathname === ROUTES.newExpense || pathname === ROUTES.newGroup) return null
 
   function go(to: string) {
     setOpen(false)
@@ -23,7 +27,9 @@ export function Fab() {
   }
 
   return (
-    <div className="fixed z-40 right-4 bottom-20 lg:right-8 lg:bottom-8 flex flex-col items-end gap-3">
+    <>
+      {open && <div className="fixed inset-0 z-30 bg-black/30 lg:bg-transparent" onClick={() => setOpen(false)} aria-hidden />}
+      <div className="fixed z-40 right-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:right-8 lg:bottom-8 flex flex-col items-end gap-3">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -64,6 +70,7 @@ export function Fab() {
         </motion.span>
       </button>
       {open && <span className="sr-only">Quick actions open</span>}
-    </div>
+      </div>
+    </>
   )
 }

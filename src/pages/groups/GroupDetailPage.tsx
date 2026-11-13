@@ -65,25 +65,25 @@ export default function GroupDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.groups)}>
+    <div className="space-y-5 sm:space-y-6">
+      <Button variant="ghost" size="sm" className="-ml-2" onClick={() => navigate(ROUTES.groups)}>
         <ArrowLeft className="size-4" /> Back to groups
       </Button>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-4">
+        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
           <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl text-2xl" style={{ backgroundColor: `${group.colorTheme}1a` }}>
             {categoryMeta.emoji}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">{group.name}</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight break-words">{group.name}</h1>
             {group.description && <p className="text-sm text-muted-foreground mt-0.5">{group.description}</p>}
             <div className="mt-2">
               <AvatarStack members={groupMembers} />
             </div>
           </div>
         </div>
-        <div className="flex gap-2 shrink-0">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
           <Button variant="outline" onClick={() => navigate(`${ROUTES.newExpense}?groupId=${group.id}&mode=voice`)}>
             <Mic className="size-4" /> Voice
           </Button>
@@ -94,7 +94,7 @@ export default function GroupDetailPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => goTab(v as TabKey)}>
-        <TabsList>
+        <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>

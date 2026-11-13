@@ -46,6 +46,8 @@ export interface GroupsRepository {
   /** Patches `memberProfiles[memberId]` on every group that already includes this member — used
    * to fan out a saved-member edit so the change reflects wherever that member has been added. */
   syncMemberProfile(memberId: string, profile: MemberProfileLite): Promise<void>
+  /** Atomically adds one member to a group (arrayUnion), so concurrent joins never clobber each other. */
+  joinGroup(groupId: string, profile: MemberProfileLite): Promise<void>
 }
 
 export interface ExpensesRepository {

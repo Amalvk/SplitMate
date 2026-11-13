@@ -40,7 +40,7 @@ export function PayerSelector({ members, amountMinor, payers, onChange, multiMod
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <Label>Paid by</Label>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Multiple payers</span>
@@ -84,7 +84,7 @@ export function PayerSelector({ members, amountMinor, payers, onChange, multiMod
                         type="number"
                         min={0}
                         step="0.01"
-                        className="h-8 w-24 text-right"
+                        className="h-9 w-24 text-right sm:h-8"
                         value={payer.amountMinor ? minorToRupees(payer.amountMinor) : ''}
                         onChange={(e) => setMultiAmount(member.id, rupeesToMinor(Number(e.target.value) || 0))}
                       />
