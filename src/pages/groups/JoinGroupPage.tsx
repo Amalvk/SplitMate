@@ -12,6 +12,7 @@ import { fetchGroupForInvite, joinGroupAction } from '@/services/actions/groupAc
 import { isFirebaseConfigured } from '@/services/firebase/config'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
+import { canAccessGroup } from '@/utils/identity'
 import type { Group } from '@/types'
 
 type Status = 'loading' | 'ready' | 'missing'
@@ -53,15 +54,17 @@ export default function JoinGroupPage() {
     if (!user || !group) return
     setBusy(true)
     try {
-      if (!group.memberIds.includes(user.id)) {
-        await joinGroupAction(group.id, {
+      if (!canAccessGroup(group, user.id)) {
+        const updated = await joinGroupAction(group, {
           id: user.id,
           name: user.name,
           avatarColor: user.avatarColor,
           email: user.email,
           phone: user.phone,
         })
-        toast.success(`You joined ${group.name}`)
+        // Show the group right away instead of waiting for the realtime listener to deliver it.
+        useDataStore.getState().cacheGroup(updated)
+        toast.success(`You can now view ${group.name} and add expenses`)
       }
       navigate(ROUTES.group(group.id), { replace: true })
     } catch (err) {
@@ -102,7 +105,7 @@ export default function JoinGroupPage() {
     )
   }
 
-  const alreadyMember = !!currentUser && group.memberIds.includes(currentUser.id)
+  const alreadyMember = canAccessGroup(group, currentUser?.id)
 
   return (
     <AuthShell step="You're invited">
@@ -111,7 +114,7 @@ export default function JoinGroupPage() {
       </div>
       <h2 className="mt-4 text-2xl font-bold tracking-tight">Join {group.name}</h2>
       <p className="mt-1.5 text-sm text-muted-foreground">
-        {group.description || 'Add your expenses and split costs with everyone in this group.'} {group.memberIds.length} member
+        {group.description || 'View this group and add your expenses.'} {group.memberIds.length} member
         {group.memberIds.length === 1 ? '' : 's'} so far.
       </p>
 

@@ -14,13 +14,13 @@ import { OverviewTab } from '@/components/groups/tabs/OverviewTab'
 import { ExpensesTab } from '@/components/groups/tabs/ExpensesTab'
 import { MembersTab } from '@/components/groups/tabs/MembersTab'
 import { BalancesTab } from '@/components/groups/tabs/BalancesTab'
-import { AnalyticsTab } from '@/components/groups/tabs/AnalyticsTab'
 import { GROUP_CATEGORIES } from '@/constants/categories'
 import { ROUTES } from '@/constants/routes'
 import { deleteGroupAction, updateGroupAction } from '@/services/actions/groupActions'
+import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
 
-const TABS = ['overview', 'expenses', 'members', 'balances', 'analytics', 'settings'] as const
+const TABS = ['overview', 'expenses', 'members', 'balances', 'settings'] as const
 type TabKey = (typeof TABS)[number]
 
 export default function GroupDetailPage() {
@@ -28,6 +28,7 @@ export default function GroupDetailPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const groups = useDataStore((s) => s.groups)
+  const userId = useAuthStore((s) => s.currentUser?.id)
   const members = useDataStore((s) => s.members)
 
   const group = groups.find((g) => g.id === groupId)
@@ -38,7 +39,10 @@ export default function GroupDetailPage() {
   if (!group) return <Navigate to={ROUTES.groups} replace />
 
   const last = location.pathname.split('/').pop()
-  const activeTab: TabKey = (TABS as readonly string[]).includes(last ?? '') ? (last as TabKey) : 'overview'
+  // Link-joined guests can view the group and add expenses, but can't manage it.
+  const isGuest = !!userId && !group.memberIds.includes(userId)
+  const requested: TabKey = (TABS as readonly string[]).includes(last ?? '') ? (last as TabKey) : 'overview'
+  const activeTab: TabKey = isGuest && requested === 'settings' ? 'overview' : requested
 
   function goTab(tab: TabKey) {
     if (!group) return
@@ -90,16 +94,23 @@ export default function GroupDetailPage() {
         </div>
       </div>
 
+      {isGuest && (
+        <div className="rounded-xl border border-primary/30 bg-accent/40 px-4 py-3 text-sm">
+          You joined with an invite link, so you can view this group and add expenses. Ask a member to add you to the group to be included in splits and balances.
+        </div>
+      )}
+
       <Tabs value={activeTab} onValueChange={(v) => goTab(v as TabKey)}>
         <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
           <TabsTrigger value="balances">Balances</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="size-3.5" />
-          </TabsTrigger>
+          {!isGuest && (
+            <TabsTrigger value="settings">
+              <Settings className="size-3.5" />
+            </TabsTrigger>
+          )}
         </TabsList>
       </Tabs>
 
@@ -107,7 +118,6 @@ export default function GroupDetailPage() {
       {activeTab === 'expenses' && <ExpensesTab group={group} />}
       {activeTab === 'members' && <MembersTab group={group} />}
       {activeTab === 'balances' && <BalancesTab group={group} />}
-      {activeTab === 'analytics' && <AnalyticsTab group={group} />}
       {activeTab === 'settings' && (
         <Card>
           <CardContent className="p-5 space-y-4 max-w-md">

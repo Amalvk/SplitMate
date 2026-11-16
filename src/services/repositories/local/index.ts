@@ -1,3 +1,4 @@
+import { nowIso } from '@/utils/date'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
 import type { DataRepository } from '@/services/repositories/types'
@@ -53,8 +54,8 @@ export const localRepository: DataRepository = {
     async deleteGroup(groupId) {
       useDataStore.getState().deleteGroup(groupId)
     },
-    async joinGroup(groupId, profile) {
-      useDataStore.getState().addMemberToGroup(groupId, profile.id)
+    async joinGroupAsGuest(groupId, profile) {
+      useDataStore.getState().addGuestToGroup(groupId, { ...profile, createdAt: nowIso() })
     },
     async syncMemberProfile() {
       // No-op: demo mode has no memberProfiles snapshot — group rosters already read live from

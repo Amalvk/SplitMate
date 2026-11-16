@@ -8,6 +8,7 @@ import { GroupCard } from '@/components/groups/GroupCard'
 import { ROUTES } from '@/constants/routes'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
+import { canAccessGroup } from '@/utils/identity'
 
 export default function GroupsPage() {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export default function GroupsPage() {
   const groups = useDataStore((s) => s.groups)
   const [query, setQuery] = useState('')
 
-  const myGroups = useMemo(() => groups.filter((g) => userId && g.memberIds.includes(userId)), [groups, userId])
+  const myGroups = useMemo(() => groups.filter((g) => canAccessGroup(g, userId)), [groups, userId])
 
   const filtered = myGroups.filter((g) => {
     const matchesQuery = g.name.toLowerCase().includes(query.toLowerCase())

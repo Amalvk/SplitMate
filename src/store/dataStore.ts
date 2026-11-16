@@ -45,6 +45,10 @@ interface DataState {
   deleteGroup: (groupId: string) => void
   addMemberToGroup: (groupId: string, memberId: string) => void
   removeMemberFromGroup: (groupId: string, memberId: string) => void
+  /** Records a link-joined guest (not a member). Demo mode; Firebase mode writes guestIds server-side. */
+  addGuestToGroup: (groupId: string, guest: Member) => void
+  /** Makes a group usable immediately, before the Firestore snapshot echoes it back. */
+  cacheGroup: (group: Group) => void
 
   // expenses
   addExpense: (expense: Expense, actorMemberId: string) => void
@@ -146,9 +150,27 @@ export const useDataStore = create<DataState>()(
         set((s) => ({
           groups: s.groups.map((g) =>
             g.id === groupId && !g.memberIds.includes(memberId)
-              ? { ...g, memberIds: [...g.memberIds, memberId], updatedAt: nowIso() }
+              ? {
+                  ...g,
+                  memberIds: [...g.memberIds, memberId],
+                  guestIds: g.guestIds?.filter((id) => id !== memberId),
+                  updatedAt: nowIso(),
+                }
               : g,
           ),
+        })),
+      addGuestToGroup: (groupId, guest) =>
+        set((s) => ({
+          members: s.members.some((m) => m.id === guest.id) ? s.members : [...s.members, guest],
+          groups: s.groups.map((g) =>
+            g.id === groupId && !g.memberIds.includes(guest.id) && !g.guestIds?.includes(guest.id)
+              ? { ...g, guestIds: [...(g.guestIds ?? []), guest.id], updatedAt: nowIso() }
+              : g,
+          ),
+        })),
+      cacheGroup: (group) =>
+        set((s) => ({
+          groups: s.groups.some((g) => g.id === group.id) ? s.groups.map((g) => (g.id === group.id ? group : g)) : [...s.groups, group],
         })),
       removeMemberFromGroup: (groupId, memberId) =>
         set((s) => ({

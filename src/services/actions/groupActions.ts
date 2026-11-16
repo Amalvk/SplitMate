@@ -77,6 +77,7 @@ export async function addMemberToGroupAction(group: Group, memberId: string, mem
     await firebaseGroupsRepository.updateGroup({
       ...group,
       memberIds: [...group.memberIds, memberId],
+      guestIds: group.guestIds?.filter((id) => id !== memberId),
       memberProfiles: { ...group.memberProfiles, [memberId]: toProfile(member) },
       updatedAt: nowIso(),
     })
@@ -104,16 +105,21 @@ export async function fetchGroupForInvite(groupId: string): Promise<Group | null
   return firebaseGroupsRepository.getGroup(groupId)
 }
 
-/** Adds the signed-in user to a group they opened an invite link for. */
-export async function joinGroupAction(groupId: string, profile: MemberProfileLite) {
+/**
+ * Registers the signed-in user as a guest of a group they opened an invite link for. Guests can see
+ * the group and add expenses, but are not members (no splits/balances) until a member adds them.
+ * Returns the group as it now stands so the caller can show it immediately.
+ */
+export async function joinGroupAction(group: Group, profile: MemberProfileLite): Promise<Group> {
   if (isFirebaseConfigured()) {
     const { firebaseGroupsRepository } = await import('@/services/repositories/firebase/data.repository')
-    await firebaseGroupsRepository.joinGroup(groupId, profile)
-    return
+    await firebaseGroupsRepository.joinGroupAsGuest(group.id, profile)
+  } else {
+    useDataStore.getState().addGuestToGroup(group.id, { ...profile, createdAt: nowIso() })
   }
-  const store = useDataStore.getState()
-  if (!store.members.some((m) => m.id === profile.id)) {
-    store.saveMember({ ...profile, createdAt: nowIso() })
+  return {
+    ...group,
+    guestIds: Array.from(new Set([...(group.guestIds ?? []), profile.id])),
+    memberProfiles: { ...group.memberProfiles, [profile.id]: profile },
   }
-  store.addMemberToGroup(groupId, profile.id)
 }

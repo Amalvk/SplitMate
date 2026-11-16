@@ -48,9 +48,9 @@ export const firebaseGroupsRepository: GroupsRepository = {
     const snap = await getDocs(query(collection(getFirebaseDb(), 'groups'), where('memberIds', 'array-contains', memberId)))
     await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { [`memberProfiles.${memberId}`]: profile })))
   },
-  async joinGroup(groupId, profile) {
+  async joinGroupAsGuest(groupId, profile) {
     await updateDoc(doc(getFirebaseDb(), 'groups', groupId), {
-      memberIds: arrayUnion(profile.id),
+      guestIds: arrayUnion(profile.id),
       [`memberProfiles.${profile.id}`]: profile,
       updatedAt: new Date().toISOString(),
     })

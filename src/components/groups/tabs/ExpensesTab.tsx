@@ -17,6 +17,12 @@ export function ExpensesTab({ group }: { group: Group }) {
   const [category, setCategory] = useState<ExpenseCategory | 'all'>('all')
   const [paidBy, setPaidBy] = useState<string | 'all'>('all')
 
+  // Stable numbering: 1 is the group's first expense, regardless of search/filters.
+  const numbers = useMemo(
+    () => new Map([...expenses].sort((a, b) => compareNewestFirst(b, a)).map((e, i) => [e.id, i + 1] as const)),
+    [expenses],
+  )
+
   const filtered = useMemo(() => {
     let list = expenses.filter((e) => e.title.toLowerCase().includes(query.toLowerCase()))
     if (category !== 'all') list = list.filter((e) => e.category === category)
@@ -56,7 +62,7 @@ export function ExpensesTab({ group }: { group: Group }) {
 
       </div>
 
-      <ExpenseTimeline expenses={filtered} />
+      <ExpenseTimeline expenses={filtered} numbers={numbers} />
     </div>
   )
 }

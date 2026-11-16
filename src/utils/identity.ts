@@ -25,3 +25,8 @@ export function defaultNameFromEmail(email: string): string {
     .map((w) => w[0].toUpperCase() + w.slice(1))
   return words.length ? words.join(' ') : email
 }
+
+/** Members and link-joined guests can both open a group and add expenses to it. */
+export function canAccessGroup(group: { memberIds: string[]; guestIds?: string[] }, userId: string | undefined | null): boolean {
+  return !!userId && (group.memberIds.includes(userId) || !!group.guestIds?.includes(userId))
+}

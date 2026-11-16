@@ -48,6 +48,12 @@ export interface Group {
   endDate?: string
   memberIds: string[]
   /**
+   * People who opened the invite link but haven't been added as members. They can see the group and
+   * add expenses, but aren't part of splits/balances until a member adds them. Profiles for guests
+   * live in `memberProfiles` alongside members.
+   */
+  guestIds?: string[]
+  /**
    * Shared roster snapshot, keyed by memberId — travels with the group doc itself so any group
    * member can resolve names/avatars for everyone else without a separate subcollection/listener.
    * Only present for Firestore-backed groups; local/demo mode resolves names from the flat

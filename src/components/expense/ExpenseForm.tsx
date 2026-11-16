@@ -11,6 +11,7 @@ import { SplitEditor } from '@/components/expense/SplitEditor'
 import { addExpenseAction, updateExpenseAction } from '@/services/actions/expenseActions'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
+import { canAccessGroup } from '@/utils/identity'
 import {
   calculateCustomSplit,
   calculateEqualSplit,
@@ -57,7 +58,7 @@ export function ExpenseForm({ lockedGroupId, expense, draft, onSaved, onCancel }
   const members = useDataStore((s) => s.members)
   const [saving, setSaving] = useState(false)
 
-  const myGroups = useMemo(() => groups.filter((g) => userId && g.memberIds.includes(userId)), [groups, userId])
+  const myGroups = useMemo(() => groups.filter((g) => canAccessGroup(g, userId)), [groups, userId])
 
   const [groupId, setGroupId] = useState(expense?.groupId ?? lockedGroupId ?? myGroups[0]?.id ?? '')
   const group = groups.find((g) => g.id === groupId)

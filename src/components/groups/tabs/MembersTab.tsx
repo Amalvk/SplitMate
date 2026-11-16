@@ -19,6 +19,8 @@ export function MembersTab({ group }: { group: Group }) {
   const allMembers = useDataStore((s) => s.members)
 
   const groupMembers = useMemo(() => allMembers.filter((m) => group.memberIds.includes(m.id)), [allMembers, group.memberIds])
+  const guests = useMemo(() => allMembers.filter((m) => group.guestIds?.includes(m.id)), [allMembers, group.guestIds])
+  const isMember = !!userId && group.memberIds.includes(userId)
   const [addOpen, setAddOpen] = useState(false)
   const [pendingAdd, setPendingAdd] = useState<string[]>(group.memberIds)
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
@@ -74,6 +76,11 @@ export function MembersTab({ group }: { group: Group }) {
     setAddOpen(false)
   }
 
+  async function handleAddGuest(guest: Member) {
+    await addMemberToGroupAction(group, guest.id, guest)
+    toast.success(`${guest.name} added to ${group.name}`)
+  }
+
   async function handleRemove() {
     if (!removeTarget) return
     await removeMemberFromGroupAction(group, removeTarget.id)
@@ -124,15 +131,17 @@ export function MembersTab({ group }: { group: Group }) {
             </DialogContent>
           </Dialog>
 
-          <Button
-            size="sm"
-            onClick={() => {
-              setPendingAdd(group.memberIds)
-              setAddOpen(true)
-            }}
-          >
-            <UserPlus className="size-4" /> Add member
-          </Button>
+          {isMember && (
+            <Button
+              size="sm"
+              onClick={() => {
+                setPendingAdd(group.memberIds)
+                setAddOpen(true)
+              }}
+            >
+              <UserPlus className="size-4" /> Add member
+            </Button>
+          )}
         </div>
       </div>
 
@@ -157,7 +166,7 @@ export function MembersTab({ group }: { group: Group }) {
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{member.email ?? member.phone ?? ''}</p>
               </div>
-              {member.id !== userId && (
+              {isMember && member.id !== userId && (
                 <Button variant="ghost" size="icon-sm" onClick={() => setRemoveTarget(member)}>
                   <Trash2 className="size-4" />
                 </Button>
@@ -166,6 +175,40 @@ export function MembersTab({ group }: { group: Group }) {
           </Card>
         ))}
       </div>
+
+      {guests.length > 0 && (
+        <div className="space-y-3">
+          <div>
+            <h3 className="font-semibold">Joined via link ({guests.length})</h3>
+            <p className="text-xs text-muted-foreground">They can view the group and add expenses, but aren't part of splits until added.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {guests.map((guest) => (
+              <Card key={guest.id}>
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Avatar name={guest.name} size="lg" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold truncate">{guest.name}</p>
+                      {guest.id === userId && (
+                        <Badge variant="outline" className="text-[10px]">
+                          You
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">{guest.email ?? guest.phone ?? 'Guest'}</p>
+                  </div>
+                  {isMember && (
+                    <Button size="sm" variant="outline" onClick={() => handleAddGuest(guest)}>
+                      <UserPlus className="size-3.5" /> Add
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>

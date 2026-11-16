@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, BarChart3, Repeat, Sparkles, Users, Wallet } from 'lucide-react'
+import { ArrowRight, BarChart3, Sparkles, Users, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { ROUTES } from '@/constants/routes'
@@ -12,7 +12,6 @@ const FEATURES = [
   { icon: Wallet, title: 'Instant balances', desc: 'Always know who owes what, updated the moment an expense is added.' },
   { icon: BarChart3, title: 'Smart settlements', desc: 'Settle up with the fewest payments possible — not a spreadsheet of IOUs.' },
   { icon: Users, title: 'Reusable members', desc: 'Add someone once, reuse them across every trip, room or event.' },
-  { icon: Repeat, title: 'Group analytics', desc: 'See spending by category, over time, and who’s contributing what.' },
 ]
 
 export default function LandingPage() {

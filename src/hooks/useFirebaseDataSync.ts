@@ -60,44 +60,63 @@ export function useFirebaseDataSync() {
         }),
       )
 
+      // Groups the user belongs to (member) and groups they were let into via an invite link (guest)
+      // arrive on two separate queries; merge them so everything downstream sees one list.
+      let memberGroups: Group[] = []
+      let guestGroups: Group[] = []
+
+      const processGroups = () => {
+        const byId = new Map<string, Group>()
+        for (const g of [...guestGroups, ...memberGroups]) byId.set(g.id, g)
+        const groups = Array.from(byId.values())
+        useDataStore.getState().hydrateGroups(groups)
+
+        // Self-heal: if any group still carries an older copy of this user's name (e.g. they
+        // renamed before profile syncing existed), push the current profile into those groups.
+        const me = useAuthStore.getState().currentUser
+        if (me && healedName !== me.name && groups.some((g) => g.memberProfiles?.[me.id] && g.memberProfiles[me.id].name !== me.name)) {
+          healedName = me.name
+          void syncOwnProfileToGroupsAction(me).catch(() => {
+            healedName = undefined
+          })
+        }
+
+        const currentIds = new Set(groups.map((g) => g.id))
+
+        for (const [groupId, cleanups] of groupUnsubs) {
+          if (!currentIds.has(groupId)) {
+            cleanups.forEach((fn) => fn())
+            groupUnsubs.delete(groupId)
+          }
+        }
+
+        for (const groupId of currentIds) {
+          if (groupUnsubs.has(groupId)) continue
+          groupUnsubs.set(groupId, [
+            onSnapshot(collection(db, 'groups', groupId, 'expenses'), (s) =>
+              useDataStore.getState().hydrateGroupExpenses(groupId, s.docs.map((d) => d.data() as Expense)),
+            ),
+            onSnapshot(collection(db, 'groups', groupId, 'settlements'), (s) =>
+              useDataStore.getState().hydrateGroupSettlements(groupId, s.docs.map((d) => d.data() as Settlement)),
+            ),
+            onSnapshot(collection(db, 'groups', groupId, 'activity'), (s) =>
+              useDataStore.getState().hydrateGroupActivity(groupId, s.docs.map((d) => d.data() as ActivityEntry)),
+            ),
+          ])
+        }
+      }
+
       topLevelUnsubs.push(
         onSnapshot(query(collection(db, 'groups'), where('memberIds', 'array-contains', userId)), (snap) => {
-          const groups = snap.docs.map((d) => d.data() as Group)
-          useDataStore.getState().hydrateGroups(groups)
+          memberGroups = snap.docs.map((d) => d.data() as Group)
+          processGroups()
+        }),
+      )
 
-          // Self-heal: if any group still carries an older copy of this user's name (e.g. they
-          // renamed before profile syncing existed), push the current profile into those groups.
-          const me = useAuthStore.getState().currentUser
-          if (me && healedName !== me.name && groups.some((g) => g.memberProfiles?.[me.id] && g.memberProfiles[me.id].name !== me.name)) {
-            healedName = me.name
-            void syncOwnProfileToGroupsAction(me).catch(() => {
-              healedName = undefined
-            })
-          }
-
-          const currentIds = new Set(groups.map((g) => g.id))
-
-          for (const [groupId, cleanups] of groupUnsubs) {
-            if (!currentIds.has(groupId)) {
-              cleanups.forEach((fn) => fn())
-              groupUnsubs.delete(groupId)
-            }
-          }
-
-          for (const groupId of currentIds) {
-            if (groupUnsubs.has(groupId)) continue
-            groupUnsubs.set(groupId, [
-              onSnapshot(collection(db, 'groups', groupId, 'expenses'), (s) =>
-                useDataStore.getState().hydrateGroupExpenses(groupId, s.docs.map((d) => d.data() as Expense)),
-              ),
-              onSnapshot(collection(db, 'groups', groupId, 'settlements'), (s) =>
-                useDataStore.getState().hydrateGroupSettlements(groupId, s.docs.map((d) => d.data() as Settlement)),
-              ),
-              onSnapshot(collection(db, 'groups', groupId, 'activity'), (s) =>
-                useDataStore.getState().hydrateGroupActivity(groupId, s.docs.map((d) => d.data() as ActivityEntry)),
-              ),
-            ])
-          }
+      topLevelUnsubs.push(
+        onSnapshot(query(collection(db, 'groups'), where('guestIds', 'array-contains', userId)), (snap) => {
+          guestGroups = snap.docs.map((d) => d.data() as Group)
+          processGroups()
         }),
       )
     })()

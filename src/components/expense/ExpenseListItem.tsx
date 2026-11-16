@@ -7,7 +7,7 @@ import { useDataStore } from '@/store/dataStore'
 import { formatINR } from '@/utils/currency'
 import type { Expense } from '@/types'
 
-export function ExpenseListItem({ expense }: { expense: Expense }) {
+export function ExpenseListItem({ expense, number }: { expense: Expense; number?: number }) {
   const userId = useAuthStore((s) => s.currentUser?.id)
   const members = useDataStore((s) => s.members)
   const byId = Object.fromEntries(members.map((m) => [m.id, m]))
@@ -24,6 +24,9 @@ export function ExpenseListItem({ expense }: { expense: Expense }) {
       to={ROUTES.expense(expense.id)}
       className="flex items-center gap-3 rounded-xl px-2 py-3 sm:px-3 hover:bg-secondary/60 transition-colors"
     >
+      {number !== undefined && (
+        <span className="w-6 shrink-0 text-center text-xs font-semibold text-muted-foreground num-tabular">{number}</span>
+      )}
       <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-xl">{categoryMeta.emoji}</div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
