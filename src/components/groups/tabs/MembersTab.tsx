@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { MemberMultiSelect } from '@/components/members/MemberMultiSelect'
 import { addMemberToGroupAction, removeMemberFromGroupAction } from '@/services/actions/groupActions'
+import { useGroupBalances } from '@/hooks/useGroupBalances'
+import { formatINR } from '@/utils/currency'
 import { useAuthStore } from '@/store/authStore'
 import { useDataStore } from '@/store/dataStore'
 import type { Group, Member } from '@/types'
@@ -21,6 +23,8 @@ export function MembersTab({ group }: { group: Group }) {
   const groupMembers = useMemo(() => allMembers.filter((m) => group.memberIds.includes(m.id)), [allMembers, group.memberIds])
   const guests = useMemo(() => allMembers.filter((m) => group.guestIds?.includes(m.id)), [allMembers, group.guestIds])
   const isMember = !!userId && group.memberIds.includes(userId)
+  const { balances } = useGroupBalances(group.id, group.memberIds)
+  const balanceById = useMemo(() => new Map(balances.map((b) => [b.memberId, b])), [balances])
   const [addOpen, setAddOpen] = useState(false)
   const [pendingAdd, setPendingAdd] = useState<string[]>(group.memberIds)
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
@@ -148,7 +152,8 @@ export function MembersTab({ group }: { group: Group }) {
       <div className="grid sm:grid-cols-2 gap-3">
         {groupMembers.map((member) => (
           <Card key={member.id}>
-            <CardContent className="p-4 flex items-center gap-3">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-3">
               <Avatar name={member.name} size="lg" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -171,6 +176,8 @@ export function MembersTab({ group }: { group: Group }) {
                   <Trash2 className="size-4" />
                 </Button>
               )}
+              </div>
+              <MemberMoney balance={balanceById.get(member.id)} />
             </CardContent>
           </Card>
         ))}
@@ -232,6 +239,29 @@ export function MembersTab({ group }: { group: Group }) {
         destructive
         onConfirm={handleRemove}
       />
+    </div>
+  )
+}
+
+function MemberMoney({ balance }: { balance?: { paidMinor: number; owedMinor: number; netMinor: number } }) {
+  if (!balance) return null
+  const { paidMinor, owedMinor, netMinor } = balance
+  return (
+    <div className="grid grid-cols-3 gap-2 rounded-lg bg-secondary/60 px-3 py-2 text-xs">
+      <div>
+        <p className="text-muted-foreground">Spent</p>
+        <p className="font-semibold num-tabular">{formatINR(paidMinor)}</p>
+      </div>
+      <div>
+        <p className="text-muted-foreground">Share</p>
+        <p className="font-semibold num-tabular">{formatINR(owedMinor)}</p>
+      </div>
+      <div>
+        <p className="text-muted-foreground">{netMinor > 0 ? 'Gets back' : netMinor < 0 ? 'Owes' : 'Balance'}</p>
+        <p className={`font-semibold num-tabular ${netMinor > 0 ? 'text-success' : netMinor < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+          {netMinor === 0 ? 'Settled' : formatINR(Math.abs(netMinor))}
+        </p>
+      </div>
     </div>
   )
 }
