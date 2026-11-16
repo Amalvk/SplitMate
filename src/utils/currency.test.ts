@@ -14,8 +14,13 @@ describe('rupeesToMinor / minorToRupees', () => {
 })
 
 describe('formatINR', () => {
-  it('formats paise as a rupee string', () => {
-    expect(formatINR(240000)).toBe('₹2,400.00')
+  it('drops the .00 for whole-rupee amounts', () => {
+    expect(formatINR(240000)).toBe('₹2,400')
+  })
+
+  it('keeps two decimals when there are paise', () => {
+    expect(formatINR(240050)).toBe('₹2,400.50')
+    expect(formatINR(240005)).toBe('₹2,400.05')
   })
 
   it('formats whole rupees without decimals when requested', () => {

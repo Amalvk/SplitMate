@@ -20,10 +20,11 @@ export function minorToRupees(minor: number): number {
   return minor / 100
 }
 
-/** Format integer paise as an INR currency string, e.g. ₹2,400.50 */
+/** Format integer paise as an INR currency string, e.g. ₹2,400 or ₹2,400.50 */
 export function formatINR(minor: number, opts?: { whole?: boolean }): string {
   const rupees = minorToRupees(minor)
-  return opts?.whole ? inrFormatterWhole.format(rupees) : inrFormatter.format(rupees)
+  // Whole-rupee amounts drop the ".00" (₹8,000); anything with paise keeps both decimals (₹8,000.50).
+  return opts?.whole || minor % 100 === 0 ? inrFormatterWhole.format(rupees) : inrFormatter.format(rupees)
 }
 
 /** Parse a free-text rupee amount ("1,200", "1200.50", "₹500") into integer paise, or null if invalid. */

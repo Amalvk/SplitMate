@@ -30,12 +30,14 @@ export function ExpenseListItem({ expense, number }: { expense: Expense; number?
       <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-xl">{categoryMeta.emoji}</div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <p className="font-medium truncate">{expense.title}</p>
+          <p className="font-medium truncate">
+            {payerNames} - {formatINR(expense.amountMinor)}
+          </p>
           {expense.source === 'voice' && <Mic className="size-3 text-muted-foreground shrink-0" />}
           {expense.source === 'text' && <PenLine className="size-3 text-muted-foreground shrink-0" />}
         </div>
         <p className="text-xs text-muted-foreground truncate">
-          {payerNames} paid {formatINR(expense.amountMinor)} · {expense.split.participantIds.length} people
+          {expense.title} - {expense.split.participantIds.length} people
         </p>
       </div>
       <div className="max-w-[38%] shrink-0 text-right leading-tight sm:max-w-none">
